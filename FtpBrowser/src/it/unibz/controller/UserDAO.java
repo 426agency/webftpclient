@@ -2,11 +2,8 @@ package it.unibz.controller;
 import it.unibz.model.UserBean;
 import it.unibz.util.ConnectionManager;
 
-import java.text.*;
-import java.util.*;
 import java.sql.*;
 
-import com.thoughtworks.xstream.XStream;
 
 /*Name: UserDAO.java 
  *Description:  stands for "User Data Access Object". This means it is responsible for accessing the 
@@ -136,6 +133,25 @@ import com.thoughtworks.xstream.XStream;
 	    }
 	    return bean;
 	
+	}
+
+	/**
+	 * Method sends insert statement to remote postgres db
+	 * @param user User to insert
+	 * @return Validated user object
+	 */
+	public static UserBean register(UserBean user) {
+		String query = "INSERT INTO users (username,password) VALUES(?,?)";  
+		try {  
+		  PreparedStatement ps;  
+		  ps = ConnectionManager.getConnection().prepareStatement(query);  
+		  ps.setString(1, user.getUsername());  
+		  ps.setString(2, user.getPassword());  
+		  user.setValid(ps.executeUpdate() != 0);  
+		  ps.close();  
+		} catch (SQLException ex) {  
+		} 
+		return user;
 	}	
 }
 
