@@ -66,7 +66,7 @@ public void doPost(HttpServletRequest request, HttpServletResponse response) thr
 														 // "currentSessionUser", so that userLogged.jsp can use it  
 														 // later to display the user's first and last names
 														 // Please take a look at userLogged.jsp now
-		response.getOutputStream().println("success");
+		response.getOutputStream().println(user.getID());
 
 		/*String u = request.getRequestURL().toString();
 		u=u.substring(0,u.indexOf("FtpBrowser")+10)+"/index.jsp";

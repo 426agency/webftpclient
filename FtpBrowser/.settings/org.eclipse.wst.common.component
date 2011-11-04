@@ -4,10 +4,6 @@
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <property name="context-root" value="FtpBrowser"/>
-<<<<<<< HEAD
-        <property name="java-output-path" value="/FtpBrowser/build/classes"/>
-=======
         <property name="java-output-path" value="/FtpBrowser/bin"/>
->>>>>>> branch 'master' of https://fbihack@github.com/fbihack/webftpclient.git
     </wb-module>
 </project-modules>

@@ -78,12 +78,13 @@ import java.sql.*;
 	        rs = stmt.executeQuery(searchQuery); 	// Save the results of the query to the ResultSet 'rs'
 	        boolean more = rs.next();            	// If 'rs' is empty, then more = false; else, more = true
 	       
-	        
+
 	        
 	        // If the ResultSet is empty >>> user does not exist >>> set the isValid variable to false
 	        if (!more) 
 	        {
 	            //System.out.println("Sorry, you are not a registered user! Please sign up first");
+
 	            bean.setValid(false);
 	        } 
 	        
@@ -92,6 +93,8 @@ import java.sql.*;
 	        // And save the user's First and Last names to the bean (To be displayed later by userLogged.jsp)
 	        else if (more) 
 	        {
+	        	bean.setID(rs.getInt("id"));
+
 	                bean.setValid(true);
 	        }
 	        
@@ -147,9 +150,17 @@ import java.sql.*;
 		  ps = ConnectionManager.getConnection().prepareStatement(query);  
 		  ps.setString(1, user.getUsername());  
 		  ps.setString(2, user.getPassword());  
-		  user.setValid(ps.executeUpdate() != 0);  
-		  ps.close();  
-		} catch (SQLException ex) {  
+		  if(ps.executeUpdate() != 0){
+		  	//Close PreparedStatement before fetching new data
+		  	ps.close(); 
+		  	return login(user);
+		  }  
+		  else{
+			  ps.close();  
+
+		  }
+		  //TO get inserted ID
+		} catch (Exception ex) {  
 		} 
 		return user;
 	}	

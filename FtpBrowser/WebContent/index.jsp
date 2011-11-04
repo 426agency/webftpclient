@@ -1,7 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"
-    import="it.unibz.model.UserBean"
-    %>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core_rt" %>
+        
     
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -16,22 +15,16 @@
 <script src="jquery.validate.min.js"></script>
 </head>
 <body>
-      <%
-					
-					// Get the bean object from the session and cast it to a UserBean 
-					UserBean currentUser = (UserBean)(session.getAttribute("currentSessionUser"));
-
-	//Noone logged in
-	 %>
 
 <div data-role="page" id="login"> 
     <div data-role="header">
         <h1>Login</h1>
-<%if(currentUser!=null){ %>
-	<a href="index.jsp" id="logoutlink" data-icon="delete" onclick="">Logout</a><%} %>
+<c:if test="${not empty sessionScope.currentSessionUser}">    
+	<a href="index.jsp#login" id="logoutlink" data-icon="delete" onclick="">Logout</a></c:if>
     </div>
     <div data-role="content"> 
-    <%if(currentUser==null){%>
+    <c:choose>
+    <c:when test="${empty sessionScope.currentSessionUser}">    
         <form action="" id="loginForm" method="post">
                         <div data-role="field-contain" class="required">
                 <label for="username">Username</label>
@@ -44,17 +37,14 @@
             <button data-role="button" data-theme="b">Login</button>
             
         </form>
-        <a href="#signup" class="signup-button" data-role="button" data-theme="e">New Account</a></div>
-        	<%
-}
-else{
-				%>
-			
-				Welcome <%= currentUser.getUsername()%> 
-							<%}
-						%>
+        <a href="#signup" class="signup-button" data-role="button" data-theme="e">New Account</a>
+        </c:when>
+        <c:otherwise>
+        <c:out value="Welcome ${sessionScope.currentSessionUser.username}"></c:out>
+        </c:otherwise>
+        </c:choose>
+        </div>
     </div> 
-</div> 
 
 <div data-role="page" id="signup"> 
     <div data-role="header">
@@ -63,7 +53,8 @@ else{
         <a href="#login" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>
     </div>
     <div data-role="content"> 
-    <%//if(currentUser==null){ %>
+    <c:choose>
+    <c:when test="${empty sessionScope.currentSessionUser}">    
         <input class="setup" type="hidden" value="Signup"/>
         <form action="" method="post" id="signupForm">
 
@@ -78,10 +69,29 @@ else{
 
             <button data-role="button" data-theme="e">Sign up!</button>
         </form>
-                    <%//}
-   // else{out.println("You cannot register while logged in!");}%>
+        </c:when>
+        <c:otherwise>
+        <c:out value="You cannot register while logged in!"></c:out>
+        </c:otherwise>
+        </c:choose>
     </div> 
 </div> 
+
+
+ <div id="ftpConnections" data-role="page">
+ <a href="" id="suserID" title="" ></a>
+ 
+            <div data-role="header">
+                <h1>Your Connections</h1>
+	<a href="index.jsp" id="logoutlink" data-icon="delete" onclick="">Logout</a>
+            </div>
+            <div class="content" data-role="content" id="ftpConnections_content">
+                <ul id="ftpConnections_list" data-role="listview" data-theme="c">
+                    
+                </ul>
+                <div id="errorDiv"></div>
+            </div>
+        </div>
 
 <script type="text/javascript">
     $(document).ready( function(){

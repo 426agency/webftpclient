@@ -9,7 +9,7 @@ htb.Logout={setup:function(){var logout=$('#logoutlink').click(
 			$.ajax({type:'POST',url:'LoginServlet',data:'logout=true',
 				success:function(data){
 					$.mobile.hidePageLoadingMsg();
-					window.location="/FtpBrowser/index.jsp";
+					window.location="/FtpBrowser/index.jsp#login";
 					},
 				error:function(data){
 					alert("Looks like we can't find the server, please try again.");
@@ -18,8 +18,21 @@ htb.Logout={setup:function(){var logout=$('#logoutlink').click(
 		}
 
 
-htb.Login={setup:function(){var login=$('#loginForm').validate({rules:{login:"required",password:"required"},messages:{login:{required:"Required"},password:{required:"Required"}},submitHandler:function(form){htb.Login.submit();},invalidHandler:function(form,validator){alert("Email/Password Required");},showErrors:function(errorMap,errorList){}});},submit:function(){$.mobile.showPageLoadingMsg();
-$.ajax({type:'POST',url:'LoginServlet',data:$("#loginForm").serialize(),success:function(data){$.mobile.hidePageLoadingMsg();data=$.trim(data);if(data=='fail'){alert("Invalid username or password");}else{window.location="/FtpBrowser/index.jsp";}},error:function(data){alert("Looks like we can't find the server, please try again.");$.mobile.hidePageLoadingMsg();}});}}
+htb.Login={setup:function(){
+	var login=$('#loginForm').validate({
+		rules:{login:"required",password:"required"},messages:{login:{required:"Required"},password:{required:"Required"}},
+		submitHandler:function(form){htb.Login.submit();},
+		invalidHandler:function(form,validator){alert("Email/Password Required");},
+		showErrors:function(errorMap,errorList){}});},submit:function(){$.mobile.showPageLoadingMsg();
+$.ajax({
+	type:'POST',url:'LoginServlet',data:$("#loginForm").serialize(),
+	success:function(data){$.mobile.hidePageLoadingMsg();
+	data=$.trim(data);if(data=='fail'){alert("Invalid username or password");}else{
+		window.location="/FtpBrowser/index.jsp#ftpConnections";
+		$("#suserID").attr("title",data);
+		}},
+	error:function(data){alert("Looks like we can't find the server, please try again.");
+	$.mobile.hidePageLoadingMsg();}});}}
 htb.Signup={
 		setup:function(){
 			var signup=$('#signupForm').validate(
@@ -32,9 +45,44 @@ htb.Signup={
 							success:function(data){$.mobile.hidePageLoadingMsg();
 							data=$.trim(data);if(data=='fail')
 							{alert("There is already such a user, please try again.");}
-							else{window.location="/FtpBrowser/index.jsp";}},
+							else{window.location="/FtpBrowser/index.jsp#ftpConnections";
+							$("#suserID").attr("title",data);}},
 							error:function(data){alert("Looks like we can't find the server, please try again.");
 							$.mobile.hidePageLoadingMsg();}});}}
+
+
+var curConnection = "";
+
+
+$('#ftpConnections').live('pageshow',function(event, ui){
+
+	var linkTitle = $("#suserID").attr("title");
+    $.ajax({
+        type: 'POST',
+        url: 'FtpConnectionsServlet?userID='+linkTitle+'&callback=?',
+        dataType: 'json',
+        cache: false,
+        error: function(jqXHR, textStatus, errorThrown){
+            $("#errorDiv").html("<h1>error!</h1><br/>"+textStatus+" "+errorThrown+" "+jqXHR);
+        },
+        success: function(data, textStatus){
+            resHtml = "";
+            $.each(data.items, function() {
+                if (this != '') {
+                    resHtml += '<li>';
+                    resHtml += '    <a href="#ftpconnection" onClick="curConnection=\''+this.host+'\'">';
+                    resHtml += '        <h3>'+this.host+'</h3>';
+                    resHtml += '    </a>';
+                    resHtml += '</li>';
+                }
+            });
+
+            $("#ftpConnections_list").html(resHtml);
+            $('#ftpConnections_list').listview('refresh');
+        }
+    });
+
+});
 
 htb.Nav={cleanUp:true,setTab:function(page,path,ele){var old=$('#'+page);var opts={reloadPage:true,showLoadMsg:false,transition:'none',changeHash:false,reverse:false}
 if($(ele).hasClass('active')&&htb.Nav.pageStack.length>1){opts['reverse']=true;opts['transition']='slide';}
