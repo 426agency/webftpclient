@@ -1,5 +1,6 @@
 package it.unibz.controller;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -56,5 +57,30 @@ public class FtpConnectionDAO
       }
       return alCatalog;
   }
+
+	public boolean createConnection(FtpConnectionBean cb) {
+		String query = "INSERT INTO ftpconnections (username,password,host,port,userid) VALUES(?,?,?,?,?)";  
+		try {  
+		  PreparedStatement ps;  
+		  ps = ConnectionManager.getConnection().prepareStatement(query);  
+		  ps.setString(1, cb.getUsername());  
+		  ps.setString(2, cb.getPassword());
+		  ps.setString(3, cb.getHost());
+		  ps.setInt(4, cb.getPort());
+		  ps.setInt(5, cb.getUserID());
+		  if(ps.executeUpdate() != 0){
+		  	//Close PreparedStatement before fetching new data
+		  	ps.close(); 
+		  	return true;
+		  }  
+		  else{
+			  ps.close();  
+			  return false;
+		  }
+		  //TO get inserted ID
+		} catch (Exception ex) {  
+			return false;
+		} 
+	}
 
 }

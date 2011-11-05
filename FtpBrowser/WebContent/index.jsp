@@ -89,8 +89,35 @@
                 <ul id="ftpConnections_list" data-role="listview" data-theme="c">
                     
                 </ul>
-                <div id="errorDiv"></div>
+                                <div id="errorDiv"></div>
             </div>
+            <!--Add collapsible list item for new Connection-->
+                <div data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden">
+				<h3 style="border-top: 1px solid #ccc;">Add Account</h3>
+				 <form action="" id="addFtpAccountForm" method="post">
+                        <div data-role="field-contain" class="required">
+                <label for="username">Username</label>
+                <input type="text" name="ftpuser" value="" class="text-box"  />            </div>
+            <div data-role="field-contain" class="required">
+                <label for="password">Password</label>
+
+                <input type="password" name="password" id="password" value="" />
+            </div>
+            <div data-role="field-contain" class="required">
+                <label for="host">Host</label>
+                <input type="text" name="host" value="" class="text-box"  />            </div>
+            <div data-role="field-contain" class="required">
+                <label for="port">Port</label>
+
+                <input type="text" name="port" id="port" value="21" />
+            </div>
+            <input type="hidden" name="activity" value="create"/>
+            <button data-role="button" data-theme="b">Create</button>
+            
+        </form>
+				</div>
+
+            
         </div>
 
 <script type="text/javascript">
@@ -98,6 +125,7 @@
         htb.Login.setup();
         htb.Signup.setup();
         htb.Logout.setup();
+        htb.CreateFtp.setup();
     });
 </script>
 </body>

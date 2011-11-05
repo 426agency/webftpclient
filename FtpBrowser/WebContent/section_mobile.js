@@ -9,7 +9,8 @@ htb.Logout={setup:function(){var logout=$('#logoutlink').click(
 			$.ajax({type:'POST',url:'LoginServlet',data:'logout=true',
 				success:function(data){
 					$.mobile.hidePageLoadingMsg();
-					window.location="/FtpBrowser/index.jsp#login";
+					window.location="/FtpBrowser/";
+	                location.reload();
 					},
 				error:function(data){
 					alert("Looks like we can't find the server, please try again.");
@@ -29,7 +30,6 @@ $.ajax({
 	success:function(data){$.mobile.hidePageLoadingMsg();
 	data=$.trim(data);if(data=='fail'){alert("Invalid username or password");}else{
 		window.location="/FtpBrowser/index.jsp#ftpConnections";
-		$("#suserID").attr("title",data);
 		}},
 	error:function(data){alert("Looks like we can't find the server, please try again.");
 	$.mobile.hidePageLoadingMsg();}});}}
@@ -45,8 +45,26 @@ htb.Signup={
 							success:function(data){$.mobile.hidePageLoadingMsg();
 							data=$.trim(data);if(data=='fail')
 							{alert("There is already such a user, please try again.");}
+							else{window.location="/FtpBrowser/index.jsp#ftpConnections";}},
+							error:function(data){alert("Looks like we can't find the server, please try again.");
+							$.mobile.hidePageLoadingMsg();}});}}
+
+htb.CreateFtp={
+		setup:function(){
+			var createftp=$('#addFtpAccountForm').validate(
+					{rules:{username:"required",password:{required:true,minlength:4},host:"required",port:{required:true,number: true}},
+						messages:{username:{required:"Required"},password:{required:"4 characters minimum",minlength:"4 characters minimum"},host:{required:"Required"},
+							port:{required:"Required",number:"Numeric input needed"}},
+						submitHandler:function(form){htb.CreateFtp.submit();return false;},
+						invalidHandler:function(form,validator){alert("You made a mistake!");}});},
+						submit:function(){$.mobile.showPageLoadingMsg();
+						$.ajax({type:'POST',url:'FtpConnectionsServlet',data:$("#addFtpAccountForm").serialize(),
+							success:function(data){$.mobile.hidePageLoadingMsg();
+							data=$.trim(data);if(data=='fail')
+							{alert("There was an error, please try again.");}
 							else{window.location="/FtpBrowser/index.jsp#ftpConnections";
-							$("#suserID").attr("title",data);}},
+			                location.reload();
+							}},
 							error:function(data){alert("Looks like we can't find the server, please try again.");
 							$.mobile.hidePageLoadingMsg();}});}}
 
@@ -56,10 +74,9 @@ var curConnection = "";
 
 $('#ftpConnections').live('pageshow',function(event, ui){
 
-	var linkTitle = $("#suserID").attr("title");
     $.ajax({
         type: 'POST',
-        url: 'FtpConnectionsServlet?userID='+linkTitle+'&callback=?',
+        url: 'FtpConnectionsServlet?activity=getall&callback=?',
         dataType: 'json',
         cache: false,
         error: function(jqXHR, textStatus, errorThrown){
@@ -76,7 +93,8 @@ $('#ftpConnections').live('pageshow',function(event, ui){
                     resHtml += '</li>';
                 }
             });
-
+            
+            
             $("#ftpConnections_list").html(resHtml);
             $('#ftpConnections_list').listview('refresh');
         }
