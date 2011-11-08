@@ -34,6 +34,7 @@ public class FtpConnectionDAO
               anItem.setPort(rs.getInt("port"));
               anItem.setUsername(rs.getString("username"));
               anItem.setPassword(rs.getString("password"));
+              anItem.setConnectionname(rs.getString("connectionname"));
               alCatalog.add(anItem);
           }
       } catch (Exception e) {
@@ -59,7 +60,7 @@ public class FtpConnectionDAO
   }
 
 	public boolean createConnection(FtpConnectionBean cb) {
-		String query = "INSERT INTO ftpconnections (username,password,host,port,userid) VALUES(?,?,?,?,?)";  
+		String query = "INSERT INTO ftpconnections (username,password,host,port,userid,connectionname) VALUES(?,?,?,?,?,?)";  
 		try {  
 		  PreparedStatement ps;  
 		  ps = ConnectionManager.getConnection().prepareStatement(query);  
@@ -68,6 +69,32 @@ public class FtpConnectionDAO
 		  ps.setString(3, cb.getHost());
 		  ps.setInt(4, cb.getPort());
 		  ps.setInt(5, cb.getUserID());
+		  ps.setString(6, cb.getConnectionname());
+		  if(ps.executeUpdate() != 0){
+		  	//Close PreparedStatement before fetching new data
+		  	ps.close(); 
+		  	return true;
+		  }  
+		  else{
+			  ps.close();  
+			  return false;
+		  }
+		  //TO get inserted ID
+		} catch (Exception ex) {  
+			return false;
+		} 
+	}
+
+	public boolean editConnection(FtpConnectionBean cb) {
+		String query = "UPDATE ftpconnections SET username=?,password=?,host=?,port=? WHERE connectionname=?";  
+		try {  
+		  PreparedStatement ps;  
+		  ps = ConnectionManager.getConnection().prepareStatement(query);  
+		  ps.setString(1, cb.getUsername());  
+		  ps.setString(2, cb.getPassword());
+		  ps.setString(3, cb.getHost());
+		  ps.setInt(4, cb.getPort());
+		  ps.setString(5, cb.getConnectionname());
 		  if(ps.executeUpdate() != 0){
 		  	//Close PreparedStatement before fetching new data
 		  	ps.close(); 

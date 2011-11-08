@@ -7,6 +7,7 @@ ${callback}(<json:object>
       <json:property name="password" value="${item.password}"/>
       <json:property name="host" value="${item.host}"/>
       <json:property name="port" value="${item.port}"/>
+      <json:property name="connectionname" value="${item.connectionname}"/>
     </json:object>
   </json:array>
 </json:object>)

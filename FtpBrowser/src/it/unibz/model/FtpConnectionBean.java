@@ -9,6 +9,13 @@ public class FtpConnectionBean
 	String username=null;
 	String password=null;
 	String host=null;
+	String connectionname=null;
+	public String getConnectionname() {
+		return connectionname;
+	}
+	public void setConnectionname(String connectionname) {
+		this.connectionname = connectionname;
+	}
 	int userID;
 	public int getUserID() {
 		return userID;

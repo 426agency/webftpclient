@@ -4,7 +4,7 @@ htb.Nav.setTab('settings','/mobile/settings',$('#tabBar a.settings'));},getHashP
 return q;while(e=r.exec(q))
 hashParams[d(e[1])]=d(e[2]);return hashParams;},logout:function(){$.mobile.showPageLoadingMsg();$.get("/mobile/logout",function(data){window.location.reload();});},toggleModal:function(modal){var offset=$(window).scrollTop();if($(modal).hasClass('show')){$(modal).fadeOut('fast');$(modal).removeClass('show');$(modal).addClass('hide');}else{$('.modal-wrapper',modal).css('top',(offset+80)+'px');$(modal).fadeIn('fast');$(modal).removeClass('hide');$(modal).addClass('show');}},toggleMessage:function(msg){var b=$('#htbMessage').clone();b.attr('id','');b.css('top',(window.pageYOffset+ window.innerHeight- 40)+'px');b.children('span').html(msg);b.insertAfter('#basic');b.fadeIn('slow').delay(2000).fadeOut(function(){$(this).remove();});},searchBeers:function(){$('.search-start').hide();$.mobile.showPageLoadingMsg();term=$('#searchBeersText').val();$.ajax({url:'/mobile/beer/find',type:'GET',data:{term:term},success:function(data){$.mobile.hidePageLoadingMsg();data=$.trim(data);if(data=='fail'){}else{$('#searchResults').html(data).listview('refresh');}},error:function(data){$.mobile.hidePageLoadingMsg();}});},listLoadMore:function(ele){var ul=$(ele).parents('ul');var more=$('.morePath',ul).val();var page=$('.nextPage',ul).val();$(ele).html('Loading...');$.ajax({type:'GET',url:more,data:{page:page},success:function(data){$.mobile.hidePageLoadingMsg();data=$.trim(data);if(data=='fail'){$(ele).html('No more...');}else{$("#tmpList").empty();$(data).appendTo('#tmpList');$("#tmpList").listview("refresh");$('#tmpList li').insertBefore($(ele).parents('li'));$(ele).html('Show more...');$('.nextPage',ul).val(parseInt(page)+1);}},error:function(data){$.mobile.hidePageLoadingMsg();}});}};
 
-htb.Logout={setup:function(){var logout=$('#logoutlink').click(
+htb.Logout={setup:function(){var logout=$('.logoutlink').click(
 		function(){
 			$.ajax({type:'POST',url:'LoginServlet',data:'logout=true',
 				success:function(data){
@@ -49,24 +49,36 @@ htb.Signup={
 							error:function(data){alert("Looks like we can't find the server, please try again.");
 							$.mobile.hidePageLoadingMsg();}});}}
 
+var temp;
 htb.CreateFtp={
 		setup:function(){
-			var createftp=$('#addFtpAccountForm').validate(
-					{rules:{username:"required",password:{required:true,minlength:4},host:"required",port:{required:true,number: true}},
+			$('.addFtpAccountForm').each( function(){
+
+				var form = $(this);
+				form.validate(
+					
+					{rules:{username:"required",password:{required:true,minlength:4},host:"required",port:{required:true,number: true},connectionname:"required"},
 						messages:{username:{required:"Required"},password:{required:"4 characters minimum",minlength:"4 characters minimum"},host:{required:"Required"},
-							port:{required:"Required",number:"Numeric input needed"}},
-						submitHandler:function(form){htb.CreateFtp.submit();return false;},
-						invalidHandler:function(form,validator){alert("You made a mistake!");}});},
-						submit:function(){$.mobile.showPageLoadingMsg();
-						$.ajax({type:'POST',url:'FtpConnectionsServlet',data:$("#addFtpAccountForm").serialize(),
-							success:function(data){$.mobile.hidePageLoadingMsg();
-							data=$.trim(data);if(data=='fail')
-							{alert("There was an error, please try again.");}
-							else{window.location="/FtpBrowser/index.jsp#ftpConnections";
-			                location.reload();
-							}},
-							error:function(data){alert("Looks like we can't find the server, please try again.");
-							$.mobile.hidePageLoadingMsg();}});}}
+							port:{required:"Required",number:"Numeric input needed"},connectionname:{required:"Required"}},
+							
+						submitHandler:function(){
+							$.mobile.showPageLoadingMsg();
+							$.ajax({type:'POST',url:'FtpConnectionsServlet',data:form.serialize(),
+								success:function(data){$.mobile.hidePageLoadingMsg();
+								data=$.trim(data);if(data=='fail')
+								{alert("There was an error, please try again.");}
+								else{window.location="/FtpBrowser/index.jsp#ftpConnections";
+				                location.reload();
+								}},
+								error:function(data){alert("Looks like we can't find the server, please try again.");
+								$.mobile.hidePageLoadingMsg();}});
+							return false;},
+						invalidHandler:function(form,validator){alert("You made a mistake!");}
+							});
+				});
+			
+
+							}};
 
 
 var curConnection = "";
@@ -83,20 +95,60 @@ $('#ftpConnections').live('pageshow',function(event, ui){
             $("#errorDiv").html("<h1>error!</h1><br/>"+textStatus+" "+errorThrown+" "+jqXHR);
         },
         success: function(data, textStatus){
-            resHtml = "";
+            resHtml = '<div id="test">';
             $.each(data.items, function() {
                 if (this != '') {
-                    resHtml += '<li>';
-                    resHtml += '    <a href="#ftpconnection" onClick="curConnection=\''+this.host+'\'">';
-                    resHtml += '        <h3>'+this.host+'</h3>';
-                    resHtml += '    </a>';
-                    resHtml += '</li>';
+//                	resHtml += '<div data-role="collapsible">';
+//                		resHtml += '  <h3>Im a header</h3>';
+//                	resHtml += '  <p>Im the collapsible content. By default Im closed, but you can click the header to open me.</p>';
+//                	resHtml += '</div>';
+
+                	resHtml += '   <div data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden ui-collapsible-contain">';
+                	resHtml += '<h3 style="border-top: 1px solid #ccc;">'+this.connectionname+'</h3>';
+                	resHtml += '<form action="" class="addFtpAccountForm" method="post">';
+                	resHtml += '<div data-role="field-contain" class="required">';
+                	resHtml += '<label for="connectionname">Connection Name</label>';
+                	resHtml += '<input type="text" name="connectionname" readonly="readonly" value="'+this.connectionname+'" class="text-box"  />            </div>';
+                	resHtml += '<div data-role="field-contain" class="required">';
+                	resHtml += '<label for="username">Username</label>';
+                	resHtml += '<input type="text" name="username" value="'+this.username+'" class="text-box"  />            </div>';
+                	resHtml += '<div data-role="field-contain" class="required">';
+                	resHtml += '<label for="password">Password</label>';
+
+                	resHtml += '<input type="password" name="password" id="password" value="'+this.password+'" />';
+                	resHtml += '</div>';
+                	resHtml += '<div data-role="field-contain" class="required">';
+                	resHtml += '<label for="host">Host</label>';
+                	resHtml += '<input type="text" name="host" value="'+this.host+'" class="text-box"  />            </div>';
+                	resHtml += '<div data-role="field-contain" class="required">';
+                	resHtml += '<label for="port">Port</label>';
+
+                	resHtml += '<input type="text" name="port" id="port" value="'+this.port+'" />';
+                	resHtml += '</div>';
+                	resHtml += '<input type="hidden" name="activity" value="edit"/>';
+                	resHtml += '<button data-role="button" data-theme="b">Save Changes</button>';
+
+                	resHtml += '</form>';
+                	resHtml += '</div>';
+                	
+                	
+                	
+// resHtml += '<li>';
+// resHtml += ' <a href="#ftpconnection"
+// onClick="curConnection=\''+this.host+'\'">';
+// resHtml += ' <h3>'+this.host+'</h3>';
+//                    resHtml += '    </a>';
+//                    resHtml += '</li>';
                 }
             });
             
-            
+            resHtml += '</div>';
             $("#ftpConnections_list").html(resHtml);
-            $('#ftpConnections_list').listview('refresh');
+            $('div[data-role=collapsible]').collapsible();
+            htb.CreateFtp.setup();
+
+
+            // $('#ftpConnections_list')..listview('refresh');
         }
     });
 

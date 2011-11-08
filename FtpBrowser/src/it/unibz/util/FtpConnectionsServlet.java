@@ -49,18 +49,17 @@ public class FtpConnectionsServlet extends HttpServlet
   	      RequestDispatcher dispatcher = request.getRequestDispatcher("ftpConnectionsJSon.jsp");
   	      dispatcher.include(request, response);
   			}
-  			if(activity.equals("create")&&user!=null){
+  			if((activity.equals("create")||activity.equals("edit"))&&user!=null){
   				FtpConnectionBean cb = new FtpConnectionBean();
   				cb.setHost(request.getParameter("host"));
   				cb.setPassword(request.getParameter("password"));
+  				cb.setConnectionname(request.getParameter("connectionname"));
   				cb.setPort(request.getParameter("port").length()>0?Integer.parseInt(request.getParameter("port")):21);
   				cb.setUsername(request.getParameter("username"));
   				cb.setUserID(user.getID());
   				FtpConnectionDAO dao =  new FtpConnectionDAO();
-  				if(dao.createConnection(cb))
-  					response.getOutputStream().println("success");
-  				else
-  					response.getOutputStream().println("fail");
+  				response.getOutputStream().println((activity.equals("create")?dao.createConnection(cb):dao.editConnection(cb))?"success":"fail");
+
   			}
   			
   		}

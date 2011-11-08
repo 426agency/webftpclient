@@ -20,7 +20,7 @@
     <div data-role="header">
         <h1>Login</h1>
 <c:if test="${not empty sessionScope.currentSessionUser}">    
-	<a href="index.jsp#login" id="logoutlink" data-icon="delete" onclick="">Logout</a></c:if>
+	<a href="index.jsp#login" class="logoutlink" data-icon="delete" onclick="">Logout</a></c:if>
     </div>
     <div data-role="content"> 
     <c:choose>
@@ -83,21 +83,23 @@
  
             <div data-role="header">
                 <h1>Your Connections</h1>
-	<a href="index.jsp" id="logoutlink" data-icon="delete" onclick="">Logout</a>
+	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
             </div>
-            <div class="content" data-role="content" id="ftpConnections_content">
-                <ul id="ftpConnections_list" data-role="listview" data-theme="c">
-                    
-                </ul>
-                                <div id="errorDiv"></div>
-            </div>
+            
+            <div class="content" data-role="content" >
+            			<div data-role="collapsible-set" class="home_collapsibles" id="ftpConnections_list">
+            			
+                    </div>
             <!--Add collapsible list item for new Connection-->
                 <div data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden">
 				<h3 style="border-top: 1px solid #ccc;">Add Account</h3>
-				 <form action="" id="addFtpAccountForm" method="post">
+				 <form action="" class="addFtpAccountForm" method="post">
+				 <div data-role="field-contain" class="required">
+                <label for="connectionname">Connection Name</label>
+                <input type="text" name="connectionname" value="" class="text-box"  />            </div>
                         <div data-role="field-contain" class="required">
                 <label for="username">Username</label>
-                <input type="text" name="ftpuser" value="" class="text-box"  />            </div>
+                <input type="text" name="username" value="" class="text-box"  />            </div>
             <div data-role="field-contain" class="required">
                 <label for="password">Password</label>
 
@@ -118,7 +120,8 @@
 				</div>
 
             
-        </div>
+            <div id="errorDiv"></div>  
+            </div></div>
 
 <script type="text/javascript">
     $(document).ready( function(){
