@@ -110,4 +110,26 @@ public class FtpConnectionDAO
 		} 
 	}
 
+	public boolean removeConnection(FtpConnectionBean cb) {
+		String query = "DELETE FROM ftpconnections WHERE connectionname=? AND userid=?";  
+		try {  
+		  PreparedStatement ps;  
+		  ps = ConnectionManager.getConnection().prepareStatement(query);  
+		  ps.setString(1, cb.getConnectionname());
+		  ps.setInt(2, cb.getUserID());
+		  if(ps.executeUpdate() != 0){
+		  	//Close PreparedStatement before fetching new data
+		  	ps.close(); 
+		  	return true;
+		  }  
+		  else{
+			  ps.close();  
+			  return false;
+		  }
+		  //TO get inserted ID
+		} catch (Exception ex) {  
+			return false;
+		} 
+	}
+
 }

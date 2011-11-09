@@ -61,6 +61,14 @@ public class FtpConnectionsServlet extends HttpServlet
   				response.getOutputStream().println((activity.equals("create")?dao.createConnection(cb):dao.editConnection(cb))?"success":"fail");
 
   			}
+  			if(activity.equals("removeConnection")){
+  				FtpConnectionDAO dao =  new FtpConnectionDAO();
+  				FtpConnectionBean cb = new FtpConnectionBean();
+  				cb.setConnectionname(request.getParameter("connectionname"));
+  				cb.setUserID(user.getID());
+  				response.getOutputStream().println(dao.removeConnection(cb)?"success":"fail");
+  				
+  			}
   			
   		}
   	

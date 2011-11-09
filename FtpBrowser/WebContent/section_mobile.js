@@ -77,6 +77,20 @@ htb.CreateFtp={
 							});
 				});
 			
+			$('.removeclass').bind('click', function (evt) { 
+				//alert($(this).parent().children('em').html());
+				$.ajax({type:'POST',url:'FtpConnectionsServlet',data:'activity=removeConnection&connectionname='+$(this).parent().children('em').html(),
+					success:function(data){
+						$.mobile.hidePageLoadingMsg();
+						window.location="/FtpBrowser/index.jsp#ftpConnections";
+		                location.reload();
+						},
+					error:function(data){
+						alert("Looks like we can't find the server, please try again.");
+						$.mobile.hidePageLoadingMsg();
+						}});
+			
+			});
 
 							}};
 
@@ -104,7 +118,7 @@ $('#ftpConnections').live('pageshow',function(event, ui){
 //                	resHtml += '</div>';
 
                 	resHtml += '   <div data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden ui-collapsible-contain">';
-                	resHtml += '<h3 style="border-top: 1px solid #ccc;">'+this.connectionname+'</h3>';
+                	resHtml += '<h3 style="border-top: 1px solid #ccc;"><em>'+this.connectionname+'</em><img class="removeclass" style="float:right" alt="Remove" src="images/remove.gif"/><img class="browseclass" style="float:right" alt="Browse" src="images/folder.gif"/></h3>';
                 	resHtml += '<form action="" class="addFtpAccountForm" method="post">';
                 	resHtml += '<div data-role="field-contain" class="required">';
                 	resHtml += '<label for="connectionname">Connection Name</label>';
