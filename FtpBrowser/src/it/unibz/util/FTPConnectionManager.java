@@ -18,11 +18,11 @@ public class FTPConnectionManager {
 		try {
 			client.connect(hostname,port);
 			boolean login = client.login(user, pass);
-			if (login) {
-				System.out.println("Login success...");
-			} else {
-				System.out.println("Login fail...");
-			}
+//			if (login) {
+//				System.out.println("Login success...");
+//			} else {
+//				System.out.println("Login fail...");
+//			}
 		}
 		catch (SocketException e) {
 			// TODO Auto-generated catch block
@@ -37,7 +37,10 @@ public class FTPConnectionManager {
 		ArrayList files = new ArrayList();
 		try {  
 			FTPFile [] fl = client.listFiles(path!=null?path:"/");
+			String t=null;
 			for(FTPFile file:fl){
+				t=file.getName().trim();
+				if(!t.equals("..")&&!t.equals("."))
 				files.add(file);
 			}
 		} catch (IOException e) {
@@ -73,7 +76,7 @@ public class FTPConnectionManager {
 		try {
 			client.logout();
 			client.disconnect();
-			System.out.println("Disconnected");
+			//System.out.println("Disconnected");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

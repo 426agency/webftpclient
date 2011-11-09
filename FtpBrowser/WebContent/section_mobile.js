@@ -95,76 +95,83 @@ htb.CreateFtp={
 			
 			$('.browseclass').bind('click', function (evt) { 
 				//alert($(this).parent().children('em').html());
-				$.ajax({type:'POST',url:'FtpConnectionsServlet',data:'activity=getfolders&callback=?&connectionname='+$(this).parent().children('em').html(),
-					success:function(data){
-						 //resHtml = '<li data-role="list-divider" id="currentfolder">'+$('#currentfolder').html()+'</li>';
-//							
-//							<li><a class="folderclass" href="#folderbrowser"  > Jose </a></li>
-//							<li><a class="folderclass" href="#folderbrowser"  > Juan </a></li>
-//							<li><a class="folderclass" href="#folderbrowser"  > Pedro </a></li>
-						 $.each(data.items, function() {
-				                if (this != '') {
-				                	
-				                resHtml+='<li><a class="folderclass" href="#folderbrowser"  > '+this.itemname+' </a></li>';
-//				                	resHtml += '<div data-role="collapsible">';
-//				                		resHtml += '  <h3>Im a header</h3>';
-//				                	resHtml += '  <p>Im the collapsible content. By default Im closed, but you can click the header to open me.</p>';
-//				                	resHtml += '</div>';
-
-//				                	resHtml += '   <div data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden ui-collapsible-contain">';
-//				                	resHtml += '<h3 style="border-top: 1px solid #ccc;"><em>'+this.connectionname+'</em><img class="removeclass" style="float:right" alt="Remove" src="images/remove.gif"/><img class="browseclass" style="float:right" alt="Browse" src="images/folder.gif"/></h3>';
-//				                	resHtml += '<form action="" class="addFtpAccountForm" method="post">';
-//				                	resHtml += '<div data-role="field-contain" class="required">';
-//				                	resHtml += '<label for="connectionname">Connection Name</label>';
-//				                	resHtml += '<input type="text" name="connectionname" readonly="readonly" value="'+this.connectionname+'" class="text-box"  />            </div>';
-//				                	resHtml += '<div data-role="field-contain" class="required">';
-//				                	resHtml += '<label for="username">Username</label>';
-//				                	resHtml += '<input type="text" name="username" value="'+this.username+'" class="text-box"  />            </div>';
-//				                	resHtml += '<div data-role="field-contain" class="required">';
-//				                	resHtml += '<label for="password">Password</label>';
-//
-//				                	resHtml += '<input type="password" name="password" id="password" value="'+this.password+'" />';
-//				                	resHtml += '</div>';
-//				                	resHtml += '<div data-role="field-contain" class="required">';
-//				                	resHtml += '<label for="host">Host</label>';
-//				                	resHtml += '<input type="text" name="host" value="'+this.host+'" class="text-box"  />            </div>';
-//				                	resHtml += '<div data-role="field-contain" class="required">';
-//				                	resHtml += '<label for="port">Port</label>';
-//
-//				                	resHtml += '<input type="text" name="port" id="port" value="'+this.port+'" />';
-//				                	resHtml += '</div>';
-//				                	resHtml += '<input type="hidden" name="activity" value="edit"/>';
-//				                	resHtml += '<button data-role="button" data-theme="b">Save Changes</button>';
-//
-//				                	resHtml += '</form>';
-//				                	resHtml += '</div>';
-				                	
-				                	
-				                	
-				// resHtml += '<li>';
-				// resHtml += ' <a href="#ftpconnection"
-				// onClick="curConnection=\''+this.host+'\'">';
-				// resHtml += ' <h3>'+this.host+'</h3>';
-//				                    resHtml += '    </a>';
-//				                    resHtml += '</li>';
-				                }}
-				                );
-				            
-				           
-				            $("#ftpfoldercontentid").html(resHtml);
-				              						},
-					error:function(data){
-						alert("Looks like we can't find the server, please try again.");
-						$.mobile.hidePageLoadingMsg();
-						}});
+				//alert($(this).parent().children('em').html());
+				$("#ftpfoldercontentid").attr('connectionname',$(this).parent().children('em').html());
+				window.location="/FtpBrowser/index.jsp#folderbrowser";
 			
 			});
 
 							}};
 
+htb.CreateFolder={
+		setup:function(){
+			$('.folderclass').bind('click', function (evt) { 
+				//alert($(this).parent().children('em').html());
+				//alert($(this).parent().children('em').html());
+				//alert($(this).html());
+				$("#ftpfoldercontentid").attr('currentfolder',$("#ftpfoldercontentid").attr('currentfolder')+'/'+$.trim($(this).html()));
+				//alert($("#ftpfoldercontentid").attr('currentfolder'));
+				 refreshFolders.refresh();
+
+			});
+			$('.mainfolderclass').bind('click', function (evt) { 
+				if($("#ftpfoldercontentid").attr('currentfolder')==''){
+					var resHtml = '';
+			        $("#ftpfoldercontentid").html(resHtml);
+			        // $('div[data-role=collapsible]').collapsible();
+			         //htb.CreateFolder.setup();
+
+
+			         $('#ftpfoldercontentid').listview('refresh');
+					history.back();
+					return false;
+				}
+				else{
+					var temp=$("#ftpfoldercontentid").attr('currentfolder');
+					temp=temp.substring(temp,temp.lastIndexOf('/'));
+					//alert(temp);
+					$("#ftpfoldercontentid").attr('currentfolder',temp);
+					//alert($("#ftpfoldercontentid").attr('currentfolder'));
+					refreshFolders.refresh();
+				}
+
+			});
+		}
+};
+
+refreshFolders={refresh:function(){$.ajax({
+    type: 'POST',
+    url: 'FtpConnectionsServlet?activity=getfolders&currentfolder='+$("#ftpfoldercontentid").attr('currentfolder')+'&connectionname='+$("#ftpfoldercontentid").attr('connectionname')+'&callback=?',
+    dataType: 'json',
+    cache: false,
+    error: function(jqXHR, textStatus, errorThrown){
+        alert("<h1>error!</h1><br/>"+textStatus+" "+errorThrown+" "+jqXHR);
+    },
+    success: function(data, textStatus){
+        resHtml = '<li><a class="mainfolderclass" href="#folderbrowser"  >..</a></li>';
+        $.each(data.items, function() {
+            if (this != '') {
+             resHtml+='<li><a class="folderclass" href="#folderbrowser"  > '+this.itemname+' </a></li>';
+
+            }
+        });
+        
+        resHtml += '';
+        $("#ftpfoldercontentid").html(resHtml);
+       // $('div[data-role=collapsible]').collapsible();
+        htb.CreateFolder.setup();
+
+
+        $('#ftpfoldercontentid').listview('refresh');
+    }
+});}};
 
 var curConnection = "";
 
+$('#folderbrowser').live('pageshow',function(event, ui){
+	 refreshFolders.refresh();
+
+});
 
 $('#ftpConnections').live('pageshow',function(event, ui){
 

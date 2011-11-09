@@ -125,10 +125,10 @@
      <div data-role="page" id="folderbrowser">
 		<header data-role="header">
 		  <h1>Browser</h1>
-		  <a href='#' class='ui-btn-right ui-btn-back' data-icon='arrow-l'>Back</a>
-		</header>
+		  	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
+		  		</header>
 		<div data-role="content">
-			<ul id="ftpfoldercontentid" data-role="listview" data-inset="true" data-theme="c"
+			<ul id="ftpfoldercontentid" currentfolder="" connectionname="/" data-role="listview" data-inset="true" data-theme="c"
 				data-dividertheme="f">
 
 			</ul>

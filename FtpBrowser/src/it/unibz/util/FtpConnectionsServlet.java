@@ -71,18 +71,30 @@ public class FtpConnectionsServlet extends HttpServlet
   			}
   			if(activity.equals("getfolders")){
   				FtpConnectionDAO dao =  new FtpConnectionDAO();
-  				FtpConnectionBean cb=dao.getItem(user.getID(),request.getParameter("connectionname"));
+  				String connectionname=request.getParameter("connectionname");
+  				HttpSession ss = request.getSession();
+  				FTPConnectionManager ftpconmgr=null;
+  				if(!connectionname.equals("/")){
+  					//ss.setAttribute("connectionname", connectionname);
+    				//Create Connectionmanager only once per user
+    				FtpConnectionBean cb=dao.getItem(user.getID(),connectionname);
+
+  					ftpconmgr= new FTPConnectionManager();
+    				ftpconmgr.doConnection(cb.getUsername(),cb.getPassword(),cb.getHost(),cb.getPort());
+    				ss.setAttribute("connectionmanager", ftpconmgr);
+  				}
+  				else{
+  					//connectionname=(String)ss.getAttribute("connectionname");
+  					ftpconmgr=(FTPConnectionManager)ss.getAttribute("connectionmanager");
+  				}
   				
-  				FTPConnectionManager ftpconmgr= new FTPConnectionManager();
-  				ftpconmgr.doConnection(cb.getUsername(),cb.getPassword(),cb.getHost(),cb.getPort());
+  				
   	  	      ArrayList catalogItems=null;
-  	  	    	if(user!=null){
-  	  	    		HttpSession s2 = request.getSession();
-  	  	    	    
-  	  	    		catalogItems =  ftpconmgr.getFileList((String)s2.getAttribute("currentfolder"));
+  	  	    	if(user!=null){    	    
+  	  	    		catalogItems =  ftpconmgr.getFileList(request.getParameter("currentfolder"));
   	  	    	}else
   	  	      	catalogItems= new ArrayList();
-  				ftpconmgr.removeConnection();
+  				//ftpconmgr.removeConnection();
 
   				
   				 String callback = request.getParameter("callback");
