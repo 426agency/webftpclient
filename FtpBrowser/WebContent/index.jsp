@@ -122,6 +122,18 @@
             
             <div id="errorDiv"></div>  
             </div></div>
+     <div data-role="page" id="folderbrowser">
+		<header data-role="header">
+		  <h1>Browser</h1>
+		  <a href='#' class='ui-btn-right ui-btn-back' data-icon='arrow-l'>Back</a>
+		</header>
+		<div data-role="content">
+			<ul id="ftpfoldercontentid" data-role="listview" data-inset="true" data-theme="c"
+				data-dividertheme="f">
+
+			</ul>
+		</div>
+	</div>
 
 <script type="text/javascript">
     $(document).ready( function(){

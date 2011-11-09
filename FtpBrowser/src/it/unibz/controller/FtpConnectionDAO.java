@@ -11,6 +11,8 @@ import it.unibz.util.ConnectionManager;
 public class FtpConnectionDAO
 {
 	private static String getItems = "SELECT * FROM ftpconnections where userid=";
+	private static String getItem = "SELECT * FROM ftpconnections where connectionname=? AND userid=?";
+
 
   /**
    * Returns a list of all items
@@ -130,6 +132,33 @@ public class FtpConnectionDAO
 		} catch (Exception ex) {  
 			return false;
 		} 
+	}
+
+	public FtpConnectionBean getItem(int id, String parameter) {
+		FtpConnectionBean anItem=null;
+		try {  
+		  PreparedStatement ps;  
+		  ps = ConnectionManager.getConnection().prepareStatement(getItem);  
+		  ps.setString(1, parameter);
+		  ps.setInt(2, id);
+		  ps.execute();
+		  ResultSet rs=ps.getResultSet();
+
+		  if(rs.next()){
+			   anItem= new FtpConnectionBean();
+	          	anItem.setUserID(id);
+	          	anItem.setHost(rs.getString("host"));
+	              anItem.setPort(rs.getInt("port"));
+	              anItem.setUsername(rs.getString("username"));
+	              anItem.setPassword(rs.getString("password"));
+	              anItem.setConnectionname(rs.getString("connectionname"));
+		  	//Close PreparedStatement before fetching new data
+		  }
+		  ps.close(); 
+		} catch (Exception ex) {  
+			return null;
+		} 
+		return anItem;
 	}
 
 }

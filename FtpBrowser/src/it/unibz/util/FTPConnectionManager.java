@@ -2,31 +2,24 @@ package it.unibz.util;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
+public class FTPConnectionManager {
 
-public class FTPConnection {
+	private FTPClient client;
 
-	private static FTPClient client;
 
-	public static void main(String[] args) {
-		doConnection("ftpunibzteam","thehons88","ftp.alwaysdata.com");
-		getFileList();
-		removeConnection();
-	}
-
-	public static void doConnection(String user, String pass, String hostname){
+	public void doConnection(String user, String pass, String hostname,int port){
 		client = new FTPClient();
 		try {
-			client.connect(hostname);
+			client.connect(hostname,port);
 			boolean login = client.login(user, pass);
 			if (login) {
 				System.out.println("Login success...");
-				boolean logout = client.logout();
-				if (logout) {
-					System.out.println("Logout from FTP server...");
-				}
 			} else {
 				System.out.println("Login fail...");
 			}
@@ -40,20 +33,21 @@ public class FTPConnection {
 		}
 	}
 
-	public static void getFileList(){
-		FTPFile[] ftpFiles = null;
-		try {
-			ftpFiles = client.listFiles();
-			for (FTPFile ftpFile : ftpFiles) {
-				System.out.println("FTPFile: " + ftpFile.getName());
+	public ArrayList getFileList(String path){
+		ArrayList files = new ArrayList();
+		try {  
+			FTPFile [] fl = client.listFiles(path!=null?path:"/");
+			for(FTPFile file:fl){
+				files.add(file);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return files;
 	}
 
-	public static boolean renameFile(String from, String to){
+	public boolean renameFile(String from, String to){
 		boolean renamed = false;
 		try {
 			renamed = client.rename(from, to);
@@ -64,7 +58,7 @@ public class FTPConnection {
 		return renamed;
 	}
 
-	public static boolean deleteFile(String filename) {
+	public boolean deleteFile(String filename) {
 		boolean deleted = false;
 		try {
 			deleted = client.deleteFile(filename);
@@ -75,13 +69,15 @@ public class FTPConnection {
 		return deleted;
 	}
 
-	public static void removeConnection(){
+	public void removeConnection(){
 		try {
-			//client.logout();
+			client.logout();
 			client.disconnect();
+			System.out.println("Disconnected");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 }
+

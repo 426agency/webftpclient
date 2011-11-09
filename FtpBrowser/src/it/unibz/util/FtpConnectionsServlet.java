@@ -69,6 +69,30 @@ public class FtpConnectionsServlet extends HttpServlet
   				response.getOutputStream().println(dao.removeConnection(cb)?"success":"fail");
   				
   			}
+  			if(activity.equals("getfolders")){
+  				FtpConnectionDAO dao =  new FtpConnectionDAO();
+  				FtpConnectionBean cb=dao.getItem(user.getID(),request.getParameter("connectionname"));
+  				
+  				FTPConnectionManager ftpconmgr= new FTPConnectionManager();
+  				ftpconmgr.doConnection(cb.getUsername(),cb.getPassword(),cb.getHost(),cb.getPort());
+  	  	      ArrayList catalogItems=null;
+  	  	    	if(user!=null){
+  	  	    		HttpSession s2 = request.getSession();
+  	  	    	    
+  	  	    		catalogItems =  ftpconmgr.getFileList((String)s2.getAttribute("currentfolder"));
+  	  	    	}else
+  	  	      	catalogItems= new ArrayList();
+  				ftpconmgr.removeConnection();
+
+  				
+  				 String callback = request.getParameter("callback");
+  		  	      request.setAttribute("foldercontent", catalogItems);
+  		  	      request.setAttribute("callback", callback);
+  		  	      
+  		  	      RequestDispatcher dispatcher = request.getRequestDispatcher("ftpFolderJSon.jsp");
+  		  	      dispatcher.include(request, response);
+  				
+  			}
   			
   		}
   	

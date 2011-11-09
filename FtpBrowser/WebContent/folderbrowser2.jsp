@@ -33,10 +33,10 @@ function DoAction( id, name ){
 		<div data-role="content">
 			<ul data-role="listview" data-inset="true" data-theme="c"
 				data-dividertheme="f">
-				<li data-role="list-divider" id="cacca">Page 2</li>
-				<li><a href="#home" OnClick="DoAction(1,'Jose');" > Jose </a></li>
-				<li><a href="#home" OnClick="DoAction(2,'Juan');" > Juan </a></li>
-				<li><a href="#home" OnClick="DoAction(3,'Pedro');" > Pedro </a></li>
+				<li data-role="list-divider" id="currentfolder">Page 2</li>
+				<li><a class="folderclass" href="#home" OnClick="DoAction(1,'Jose');" > Jose </a></li>
+				<li><a class="folderclass" href="#home" OnClick="DoAction(2,'Juan');" > Juan </a></li>
+				<li><a class="folderclass" href="#home" OnClick="DoAction(3,'Pedro');" > Pedro </a></li>
 			</ul>
 		</div>
 	</div>
