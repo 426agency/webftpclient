@@ -128,7 +128,7 @@
 		  	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
 		  		</header>
 		<div data-role="content">
-			<ul id="ftpfoldercontentid" currentfolder="" connectionname="/" data-role="listview" data-inset="true" data-theme="c"
+			<ul style="list-style-type:none; padding: 0; margin: 0;" id="ftpfoldercontentid" currentfolder="" connectionname="/" data-role="listview" data-inset="true" data-theme="c"
 				data-dividertheme="f">
 
 			</ul>
