@@ -92,7 +92,7 @@
                     </div>
             <!--Add collapsible list item for new Connection-->
                 <div data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden">
-				<h3 style="border-top: 1px solid #ccc;">Add Account</h3>
+				<h3>Add Account</h3>
 				 <form action="" class="addFtpAccountForm" method="post">
 				 <div data-role="field-contain" class="required">
                 <label for="connectionname">Connection Name</label>
@@ -128,10 +128,23 @@
 		  	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
 		  		</header>
 		<div data-role="content">
-			<ul style="list-style-type:none; padding: 0; margin: 0;" id="ftpfoldercontentid" currentfolder="" connectionname="/" data-role="listview" data-inset="true" data-theme="c"
+			<ul  id="ftpfoldercontentid" currentfolder="" connectionname="/" data-role="listview" data-inset="true" data-theme="c"
 				data-dividertheme="f">
 
 			</ul>
+			 <div id="makedirdiv" data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden">
+				<h3>Make Directory</h3>
+				<form action="" class="addDirectoryForm" method="post">
+				 <div data-role="field-contain" class="required">
+                <label for="dirname">Directory Name</label>
+                <input type="text" id="makedirdirname" name="dirname" value="" class="text-box"  />            </div>
+                            <input type="hidden" name="activity" value="makedir"/>
+                
+                            <button data-role="button" data-theme="b">Make</button>
+                
+				</form>
+				</div>
+				
 		</div>
 	</div>
 

@@ -105,7 +105,18 @@ public class FtpConnectionsServlet extends HttpServlet
   		  	      dispatcher.include(request, response);
   				
   			}
+  			if(activity.equals("removeItem")){
+  				FtpConnectionDAO dao =  new FtpConnectionDAO();
+  				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
+  				response.getOutputStream().println(ftpconmgr.deleteItem((String)request.getParameter("itemname"),((String)request.getParameter("itemtype")).equals("1"))?"success":"fail");
+  			}
+  			if(activity.equals("makedir")){
+  				FtpConnectionDAO dao =  new FtpConnectionDAO();
+  				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
+  				response.getOutputStream().println(ftpconmgr.makeDirectory((String)request.getParameter("currentfolder")+"/"+((String)request.getParameter("dirname")))?"success":"fail");
   			
+  			
+  			}
   		}
   	
       

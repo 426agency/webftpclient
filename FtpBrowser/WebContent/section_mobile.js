@@ -105,12 +105,68 @@ htb.CreateFtp={
 
 htb.CreateFolder={
 		setup:function(){
+			$('.addDirectoryForm').each( function(){
+
+				var form = $(this);
+				form.validate(
+
+						{rules:{dirname:"required"},
+							messages:{dirname:{required:"Required"}},
+
+								submitHandler:function(){
+									$.mobile.showPageLoadingMsg();
+									$.ajax({type:'POST',url:'FtpConnectionsServlet?currentfolder='+$("#ftpfoldercontentid").attr('currentfolder'),data:form.serialize(),
+										success:function(data){$.mobile.hidePageLoadingMsg();
+										data=$.trim(data);if(data=='fail')
+										{alert("There was an error, probably directory already exist!");}
+										else{							
+											refreshFolders.refresh();
+											//$("#TestCollapsible").collapsible({collapsed: false});
+											$("#makedirdiv").trigger("collapse");
+											$("#makedirdirname").val("");
+										}},
+										error:function(data){alert("Looks like we can't find the server, please try again.");
+										$.mobile.hidePageLoadingMsg();}});
+									return false;},
+									invalidHandler:function(form,validator){alert("You made a mistake!");}
+						});
+			});
+			$('.removefolderclass').bind('click', function (evt) { 
+				//$("#ftpfoldercontentid").attr('currentfolder',$("#ftpfoldercontentid").attr('currentfolder')+'/'+$.trim($(this).html()));
+				//alert($(this).attr('itemname'));
+				//CALL servlet for removal attempt
+				$.ajax({type:'POST',
+					
+					url:'FtpConnectionsServlet',data:'activity=removeItem&itemtype='+$(this).attr('itemtype')+'&itemname='+
+					$("#ftpfoldercontentid").attr('currentfolder')+'/'+$(this).attr('itemname')+
+					'&connectionname='+$("#ftpfoldercontentid").attr('connectionname'),
+					success:function(data){
+						data=$.trim(data);
+						if(data=='fail'){
+							alert("Directory is not empty!");
+						}
+						else{
+							refreshFolders.refresh();
+						}
+
+					},
+					error:function(data){
+						alert("Looks like we can't find the server, please try again.");
+						$.mobile.hidePageLoadingMsg();
+					}});
+				
+				//refreshFolders.refresh();
+				//alert("Not implemented yet");
+			});
 			$('.folderclass').bind('click', function (evt) { 
 				//alert($(this).parent().children('em').html());
 				//alert($(this).parent().children('em').html());
 				//alert($(this).html());
 				$("#ftpfoldercontentid").attr('currentfolder',$("#ftpfoldercontentid").attr('currentfolder')+'/'+$.trim($(this).html()));
 				//alert($("#ftpfoldercontentid").attr('currentfolder'));
+				$("#makedirdiv").trigger("collapse");
+				$("#makedirdirname").val("");
+
 				refreshFolders.refresh();
 
 			});
@@ -118,7 +174,7 @@ htb.CreateFolder={
 				//alert($(this).parent().children('em').html());
 				//alert($(this).parent().children('em').html());
 				//alert($(this).html());
-				alert("Not implemented yet");
+				alert("Download/Viewer not implemented yet");
 
 			});
 			$('.mainfolderclass').bind('click', function (evt) { 
@@ -158,19 +214,17 @@ refreshFolders={refresh:function(){$.ajax({
 		resHtml = '<li><a class="mainfolderclass" href="#folderbrowser"  >..</a></li>';
 		$.each(data.items, function() {
 			if (this != '') {
-				resHtml+='<li style="text-align:left;background-image: url(images/';
+				resHtml+='<li><table width="100%"><tr><td width="10%"><img src="images/';
 				if(this.typename==1)
 					resHtml+='folder.gif';
 				else
 					resHtml+='file.gif';
-				resHtml+=');background-repeat: no-repeat; background-position: 0% 50%; padding-left: .6em; " ><a class="';
+				resHtml+='"/></td><td width="70%"><a class="';
 				if(this.typename==1)
-
 					resHtml+='folderclass';
 				else
 					resHtml+='fileclass';
-				resHtml+='" href="#folderbrowser" > '+this.itemname+' </a></li>';
-
+				resHtml+='" href="#folderbrowser" > '+this.itemname+' </a></td><td width="20%" align="right"><img class="removefolderclass" alt="Remove" itemtype="'+this.typename+'" itemname="'+this.itemname+'" src="images/remove.gif"/></td></tr></table></li>';
 			}
 		});
 
@@ -211,7 +265,7 @@ $('#ftpConnections').live('pageshow',function(event, ui){
 //					resHtml += '</div>';
 
 					resHtml += '   <div data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden ui-collapsible-contain">';
-					resHtml += '<h3 style="border-top: 1px solid #ccc;"><em>'+this.connectionname+'</em><img class="removeclass" style="float:right" alt="Remove" src="images/remove.gif"/><img class="browseclass" style="float:right" alt="Browse" src="images/folder.gif"/></h3>';
+					resHtml += '<h3><em>'+this.connectionname+'</em><img class="removeclass" style="float:right" alt="Remove" src="images/remove.gif"/><img class="browseclass" style="float:right" alt="Browse" src="images/folder.gif"/></h3>';
 					resHtml += '<form action="" class="addFtpAccountForm" method="post">';
 					resHtml += '<div data-role="field-contain" class="required">';
 					resHtml += '<label for="connectionname">Connection Name</label>';
