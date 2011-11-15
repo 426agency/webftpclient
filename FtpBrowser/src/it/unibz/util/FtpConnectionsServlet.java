@@ -6,6 +6,7 @@ import it.unibz.model.UserBean;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,6 +16,12 @@ import javax.servlet.http.HttpSession;
 
 public class FtpConnectionsServlet extends HttpServlet
 {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8868246447873132050L;
+
 	/**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
    * @param request servlet request
@@ -29,8 +36,9 @@ public class FtpConnectionsServlet extends HttpServlet
   	UserBean user = null;
   	if(s!=null && s.getAttribute("currentSessionUser")!=null)
   		user= (UserBean)s.getAttribute("currentSessionUser");
-  	
-  		if(request.getParameter("activity")!=null){
+  	else
+return;
+  	if(request.getParameter("activity")!=null){
   			String activity=request.getParameter("activity");
   			if(activity.equals("getall")){
   				response.setContentType("text/html;charset=UTF-8");
@@ -78,7 +86,6 @@ public class FtpConnectionsServlet extends HttpServlet
   					//ss.setAttribute("connectionname", connectionname);
     				//Create Connectionmanager only once per user
     				FtpConnectionBean cb=dao.getItem(user.getID(),connectionname);
-
   					ftpconmgr= new FTPConnectionManager();
     				ftpconmgr.doConnection(cb.getUsername(),cb.getPassword(),cb.getHost(),cb.getPort());
     				ss.setAttribute("connectionmanager", ftpconmgr);
@@ -106,21 +113,32 @@ public class FtpConnectionsServlet extends HttpServlet
   				
   			}
   			if(activity.equals("removeItem")){
-  				FtpConnectionDAO dao =  new FtpConnectionDAO();
   				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
   				response.getOutputStream().println(ftpconmgr.deleteItem((String)request.getParameter("itemname"),((String)request.getParameter("itemtype")).equals("1"))?"success":"fail");
   			}
   			if(activity.equals("makedir")){
-  				FtpConnectionDAO dao =  new FtpConnectionDAO();
   				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
   				response.getOutputStream().println(ftpconmgr.makeDirectory((String)request.getParameter("currentfolder")+"/"+((String)request.getParameter("dirname")))?"success":"fail");
-  			
-  			
+  			}
+  			if(activity.equals("renamename")){
+  				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
+  				response.getOutputStream().println(ftpconmgr.renameFileOrDir((String)request.getParameter("currentfolder"),
+  						(String)request.getParameter("oldname"),(String)request.getParameter("renamename"))?"success":"fail");
+  			}
+  			if(activity.equals("downloadfile")){
+  				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
+  				
+  				String filename=(String)request.getParameter("filename");
+  			    response.getOutputStream().println(ftpconmgr.downloadFile((String)request.getParameter("currentfolder"),filename,getServletContext().getRealPath("temp")+"\\")?"success":"fail");
+  	  			
+  				
   			}
   		}
+  		
   	
       
   }
+
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
   /**

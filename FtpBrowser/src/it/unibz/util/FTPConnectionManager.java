@@ -1,5 +1,6 @@
 package it.unibz.util;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -42,8 +43,40 @@ private int port=21;
 		return client.login(this.user, this.pass);
 	}
 
+	public boolean downloadFile(String currentFolder,String filename,String temppath){
+
+		FileOutputStream fos = null;
+
+        try {
+    		if(!client.isConnected())
+    			login();
+            //
+            // The remote filename to be downloaded.
+            //
+            fos = new FileOutputStream(temppath+filename);
+
+            //
+            // Download file from FTP server
+            //
+            client.retrieveFile(currentFolder+"/" +filename, fos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        	return false;
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return true; 
+
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ArrayList getFileList(String path){
+	public ArrayList getFileList(String path) throws SocketException, IOException{
 		ArrayList files = new ArrayList();
 		try {  
 			if(!client.isConnected())
@@ -56,8 +89,8 @@ private int port=21;
 				files.add(file);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			login();
+			return getFileList(path);
 		}
 		
 		return files;
@@ -114,6 +147,19 @@ private int port=21;
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public boolean renameFileOrDir(String currentfolder, String oldname, String newname) {
+		boolean renamed = false;
+		try {
+			if(!client.isConnected())
+				login();
+			renamed=client.rename(currentfolder+"/"+oldname,currentfolder+"/"+newname);
+						} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return renamed;
 	}
 }
 

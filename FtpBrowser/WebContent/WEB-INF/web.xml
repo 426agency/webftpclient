@@ -20,4 +20,8 @@
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
+  <context-param>
+        <param-name>filesDir</param-name>
+        <param-value>/temp/</param-value>
+    </context-param>
 </web-app>

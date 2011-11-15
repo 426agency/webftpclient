@@ -124,10 +124,11 @@
             </div></div>
      <div data-role="page" id="folderbrowser">
 		<header data-role="header">
-		  <h1>Browser</h1>
+		  <h1 id="currentdirh3">Browser</h1>
 		  	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
 		  		</header>
 		<div data-role="content">
+			 
 			<ul  id="ftpfoldercontentid" currentfolder="" connectionname="/" data-role="listview" data-inset="true" data-theme="c"
 				data-dividertheme="f">
 
