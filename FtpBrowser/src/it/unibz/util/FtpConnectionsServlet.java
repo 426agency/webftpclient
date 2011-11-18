@@ -129,7 +129,7 @@ return;
   				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
   				
   				String filename=(String)request.getParameter("filename");
-  			    response.getOutputStream().println(ftpconmgr.downloadFile((String)request.getParameter("currentfolder"),filename,getServletContext().getRealPath("temp")+"\\")?"success":"fail");
+  			    response.getOutputStream().println(ftpconmgr.downloadFile((String)request.getParameter("currentfolder"),filename,getServletContext().getRealPath("temp")+(getServletContext().getRealPath("temp").contains("/")?"/":"\\"))?"success":"fail");
   	  			
   				
   			}
