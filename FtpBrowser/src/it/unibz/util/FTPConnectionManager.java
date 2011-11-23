@@ -1,5 +1,6 @@
 package it.unibz.util;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketException;
@@ -66,6 +67,34 @@ private int port=21;
             try {
                 if (fos != null) {
                     fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return true; 
+
+	}
+	
+	public boolean uploadFile(String currentFolder,String filename,FileInputStream fis){
+
+
+        try {
+    		if(!client.isConnected())
+    			login();
+            //
+            // The remote filename to be downloaded.
+            //
+
+    	    client.storeFile(currentFolder+"/"+filename, fis);
+    	    fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        	return false;
+        } finally {
+            try {
+                if (fis != null) {
+                    fis.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

@@ -4,8 +4,13 @@ import it.unibz.controller.FtpConnectionDAO;
 import it.unibz.model.FtpConnectionBean;
 import it.unibz.model.UserBean;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -13,6 +18,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
 
 public class FtpConnectionsServlet extends HttpServlet
 {
@@ -33,6 +46,70 @@ public class FtpConnectionsServlet extends HttpServlet
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
   throws ServletException, IOException {
   	HttpSession s = 	request.getSession();
+ // controlliamo se la request che è stata
+ // effettuata contiene o meno un file
+  	boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+  	if (isMultipart) {
+  		ServletFileUpload servletFileUpload = new ServletFileUpload(new DiskFileItemFactory());
+  	  String ret="";
+
+  		try {
+  	  List fileItemsList = servletFileUpload.parseRequest(request);
+  	  String optionalFileName = "";
+  	  FileItem fileItem = null;
+
+  	  Iterator it = fileItemsList.iterator();
+  	  while (it.hasNext()){
+  	    FileItem fileItemTemp = (FileItem)it.next();
+  	    if (fileItemTemp.isFormField()){
+  	      if (fileItemTemp.getFieldName().equals("filename"))
+  	        optionalFileName = fileItemTemp.getString();
+  	    }
+  	    else
+  	      fileItem = fileItemTemp;
+  	  }
+
+  	  if (fileItem!=null){
+  	    String fileName = fileItem.getName();
+
+  	    /* Save the uploaded file if its size is greater than 0. */
+  	    if (fileItem.getSize() > 0){
+  	      if (optionalFileName.trim().equals(""))
+  	        fileName = FilenameUtils.getName(fileName);
+  	      else
+  	        fileName = optionalFileName;
+
+String path=getServletContext().getRealPath("temp")+(getServletContext().getRealPath("temp").contains("/")?"/":"\\");
+  	      File saveTo = new File(path + fileName);
+  	      
+  	        fileItem.write(saveTo);
+    				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
+    				boolean result =ftpconmgr.uploadFile(s.getAttribute("currentfolder").toString(),fileName, (FileInputStream)fileItem.getInputStream());
+  	      	if(result){
+    				ret+= "<div id=\"status\">success</div>";
+  	  			ret+="<div id=\"message\">Successfully Uploaded</div>";
+  	  			//return the upload file
+  	  			ret+="<div id=\"uploadedfile\">"+fileName+"</div>";}
+  	      	else
+  	      	{
+  	        	ret+="<div id=\"status\">failed</div>";
+  	  				ret+="<div id=\"message\">There is already such a File</div>";
+  	      	}
+  	      
+  		}}}
+      catch (Exception e){
+      	ret+="<div id=\"status\">failed</div>";
+				ret+="<div id=\"message\">"+e.getMessage()+"</div>";
+
+		}
+  		finally{
+    		response.getOutputStream().println(ret);
+
+  		}
+ }
+  	
+  	
+  	
   	UserBean user = null;
   	if(s!=null && s.getAttribute("currentSessionUser")!=null)
   		user= (UserBean)s.getAttribute("currentSessionUser");
@@ -89,10 +166,12 @@ return;
   					ftpconmgr= new FTPConnectionManager();
     				ftpconmgr.doConnection(cb.getUsername(),cb.getPassword(),cb.getHost(),cb.getPort());
     				ss.setAttribute("connectionmanager", ftpconmgr);
+    				ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
   				}
   				else{
   					//connectionname=(String)ss.getAttribute("connectionname");
   					ftpconmgr=(FTPConnectionManager)ss.getAttribute("connectionmanager");
+  					ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
   				}
   				
   				

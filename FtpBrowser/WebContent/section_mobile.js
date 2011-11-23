@@ -206,14 +206,17 @@ htb.CreateFolder={
 				//alert("Not implemented yet");
 			});
 			$('.folderclass').bind('click', function (evt) { 
+				var filename=$.trim($(this).attr("filename"));
+
 				//alert($(this).parent().children('em').html());
 				//alert($(this).parent().children('em').html());
 				//alert($(this).html());
-				$("#ftpfoldercontentid").attr('currentfolder',$("#ftpfoldercontentid").attr('currentfolder')+'/'+$.trim($(this).html()));
+				$("#ftpfoldercontentid").attr('currentfolder',$("#ftpfoldercontentid").attr('currentfolder')+'/'+filename);
 				//$("#currentdirdiv").show(); //to show it
 				//$('div[data-role=collapsible]').collapsible();
 				//alert($("#ftpfoldercontentid").attr('currentfolder'));
 				$("#makedirdiv").trigger("collapse");
+				$("#uploaddiv").trigger("collapse");
 				$("#makedirdirname").val("");
 
 				refreshFolders.refresh();
@@ -221,11 +224,12 @@ htb.CreateFolder={
 			});
 			$('.fileclass').bind('click', function (evt) { 
 				//alert($("#ftpfoldercontentid").attr('currentfolder')+'/'+$.trim($(this).html()));
-				var filename=$.trim($(this).html());
+				//alert($(this).attr("filename"));
+				var filename=$.trim($(this).attr("filename"));
 				//filename='+$.trim($(this).html()) );
 $.ajax({type:'POST',
 					
-					url:'FtpConnectionsServlet',data:'activity=downloadfile&currentfolder='+$("#ftpfoldercontentid").attr('currentfolder')+'&filename='+$.trim($(this).html()),
+					url:'FtpConnectionsServlet',data:'activity=downloadfile&currentfolder='+$("#ftpfoldercontentid").attr('currentfolder')+'&filename='+filename,
 					success:function(data){
 						data=$.trim(data);
 						if(data=='fail'){
@@ -266,7 +270,14 @@ $.ajax({type:'POST',
 		}
 };
 
+//Needed for the iframe refresh issue
+function ref(){
+	refreshFolders.refresh();
+}
+
 refreshFolders={refresh:function(){
+	$("#uploaddiv").trigger("collapse");
+
 	$.mobile.showPageLoadingMsg();
 
 	$.ajax({
@@ -294,7 +305,7 @@ refreshFolders={refresh:function(){
 						resHtml+='folderclass';
 					else
 						resHtml+='fileclass';
-					resHtml+='" href="#folderbrowser" >';
+					resHtml+='" href="#folderbrowser" filename="'+this.itemname+'">';
 					if(this.itemname.length>20)
 						resHtml+=this.itemname.substring(0,20)+'...';
 					else
