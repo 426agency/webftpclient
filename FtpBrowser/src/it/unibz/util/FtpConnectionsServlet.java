@@ -7,7 +7,6 @@ import it.unibz.model.UserBean;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,10 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
@@ -83,8 +79,9 @@ String path=getServletContext().getRealPath("temp")+(getServletContext().getReal
   	      File saveTo = new File(path + fileName);
   	      
   	        fileItem.write(saveTo);
+  	    FileInputStream fis = new FileInputStream(saveTo.getAbsolutePath());
     				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
-    				boolean result =ftpconmgr.uploadFile(s.getAttribute("currentfolder").toString(),fileName, (FileInputStream)fileItem.getInputStream());
+    				boolean result =ftpconmgr.uploadFile(s.getAttribute("currentfolder").toString(),fileName, fis);
   	      	if(result){
     				ret+= "<div id=\"status\">success</div>";
   	  			ret+="<div id=\"message\">Successfully Uploaded</div>";
@@ -104,9 +101,8 @@ String path=getServletContext().getRealPath("temp")+(getServletContext().getReal
 		}
   		finally{
     		response.getOutputStream().println(ret);
-
   		}
- }
+ }else{
   	
   	
   	
@@ -214,7 +210,7 @@ return;
   			}
   		}
   		
-  	
+ }
       
   }
 

@@ -15,7 +15,7 @@
 			buttonUpload: '#px-submit',
 			buttonClear: '#px-clear',
 			selectFileLabel: 'Select files',
-			allowedExtension: 'jpg|jpeg|gif|png',
+			allowedExtension: '||',
 			timeInterval: [1, 2, 4, 2, 1, 5], //Mock percentage for iframe upload
 			percentageInterval: [10, 20, 30, 40, 60, 80],
 			
@@ -436,10 +436,8 @@
 						value: 100
 					});
 					$percentage.text('100%');
-
-
-					uploadQueue();
 					
+					uploadQueue();
 				});
 			}
 			
@@ -551,10 +549,8 @@
 				
 				$uploadData.removeClass('uploading').addClass('success');
 				$uploadData.children('.status').html( $(data).find('#message').text() );
-				//							refreshFolders.refresh();
 				parent.ref();
-				location.reload();
-
+				
 			} else if (status == 'error'){
 				
 				$uploadData.removeClass('uploading').addClass('error');
@@ -583,7 +579,6 @@
 			
 			$(formId).remove();
 			$(formId + '_frame').remove();
-			
 		}
 		
 		/*
