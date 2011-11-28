@@ -300,32 +300,34 @@ refreshFolders={refresh:function(){
 						resHtml+='folder.gif';
 					else
 						resHtml+='file.gif';
-					resHtml+='"/></td><td width="50%" style="word-wrap:break-word"><a class="';
+					resHtml+='"/></td><td width="70%" style="word-wrap:break-word"><a class="';
 					if(this.typename==1)
 						resHtml+='folderclass';
 					else
 						resHtml+='fileclass';
 					resHtml+='" href="#folderbrowser" filename="'+this.itemname+'">';
-					if(this.itemname.length>20)
-						resHtml+=this.itemname.substring(0,20)+'...';
+					if(this.itemname.length>17)
+						resHtml+=this.itemname.substring(0,11)+'..'+this.itemname.substring(this.itemname.length-4);
 					else
 					resHtml+=this.itemname;
-					resHtml+='</a></td><td width="30%"><img align="left" class="showhideimage" src="images/rename.gif"/></td><td width="10%"><img class="removefolderclass" alt="Remove" itemtype="'+this.typename+'" itemname="'+this.itemname+'" src="images/remove.gif"/></td></tr></table></h3>';
+					resHtml+='</a></td><td width="20%"><img class="showhideimage" src="images/edit.gif"/></td></tr></table></h3>';
 						resHtml+='	<form action="" class="renameForm" method="post">';
 							resHtml+=' <div data-role="field-contain" class="required">';
-								resHtml+='  <label for="oldname">';
-								if(this.typename==1)
-									resHtml+='Directory Name';
-								else
-									resHtml+='File Name';
+								//resHtml+='  <label for="oldname">';
+								//if(this.typename==1)
+								//	resHtml+='Directory Name';
+								//else
+									//resHtml+='File Name';
 								
-									resHtml+='</label>  <input type="text" id="renamename" name="renamename" value="'+this.itemname+'" class="text-box"  />            </div>';
+									//resHtml+='</label>
+							resHtml+='           <button data-role="button" data-theme="b">Rename to:</button>';
+			                resHtml+=' <input type="text" id="renamename" name="renamename" value="'+this.itemname+'" class="text-box" style="width:130px" />            </div>';
 										resHtml+='            <input type="hidden" name="activity" value="renamename"/>';
 										resHtml+='            <input type="hidden" name="oldname" value="'+this.itemname+'"/>';
-											resHtml+='           <button data-role="button" data-theme="b">Rename now!</button>';
-	                
-												resHtml+='</form>';
-													resHtml+='</div>';
+											
+												resHtml+='</form><button data-role="button" class="removefolderclass" itemtype="'+this.typename+'" itemname="'+this.itemname+'" data-theme="b">Remove</button>';
+												resHtml+='<button data-role="button" class="favouritefolderclass" itemtype="'+this.typename+'" itemname="'+this.itemname+'" data-theme="b">Add to favourites</button>';	
+												resHtml+='</div>';
 				
 				
 				
