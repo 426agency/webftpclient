@@ -9,6 +9,7 @@
 <title>Ftp Browser</title>
 <meta name="viewport" content="width=device-width, inital-scale=1.0, maximal-scale=1.0, user-scalable=no;"/>
 <link rel="stylesheet" href="jquery.mobile-1.0rc1.min.css" />
+
 <script src="jquery-1.6.4.min.js"></script>
 <script src="section_mobile.js"></script>
 <script src="jquery.mobile-1.0rc1.min.js"></script>
@@ -145,7 +146,15 @@
                 
 				</form>
 				</div>
-				
+				<div id="uploaddiv" data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden">
+				<h3>Upload</h3>
+				<iframe src="fileupload.html" width="100%" height="100%" marginwidth="0" marginheight="0" frameborder="no" scrolling="yes" style="border-width:2px; border-color:#333; background:#FFF; border-style:solid;">
+ </iframe>
+<!-- 	<form action="FtpConnectionsServlet" method="post" enctype="multipart/form-data"> -->
+<!-- 		<input type="file" name="filename" class="fileUpload" > -->
+<!-- 		<button id="px-submit" type="submit">Upload</button> -->
+<!-- 	</form> -->
+				</div>
 		</div>
 	</div>
 
