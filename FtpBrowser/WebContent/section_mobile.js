@@ -99,7 +99,7 @@ htb.CreateFtp={
 			$('.browseclass').bind('click', function (evt) { 
 				//alert($(this).parent().children('em').html());
 				//alert($(this).parent().children('em').html());
-				$("#ftpfoldercontentid").attr('connectionname',$(this).html());
+				$("#ftpfoldercontentid").attr('connectionname',$(this).attr('title'));
 				window.location="/FtpBrowser/index.jsp#folderbrowser";
 
 			});
@@ -305,12 +305,12 @@ refreshFolders={refresh:function(){
 						resHtml+='folderclass';
 					else
 						resHtml+='fileclass';
-					resHtml+='" href="#folderbrowser" filename="'+this.itemname+'">';
+					resHtml+='" href="#folderbrowser" title="'+this.itemname+'"  filename="'+this.itemname+'">';
 					if(this.itemname.length>17)
 						resHtml+=this.itemname.substring(0,11)+'..'+this.itemname.substring(this.itemname.length-4);
 					else
 					resHtml+=this.itemname;
-					resHtml+='</a></td><td width="20%"><img class="showhideimage" src="images/edit.gif"/></td></tr></table></h3>';
+					resHtml+='</a></td><td width="20%"><img class="showhideimage" title="Edit" src="images/edit.gif"/></td></tr></table></h3>';
 						resHtml+='	<form action="" class="renameForm" method="post">';
 							resHtml+=' <div data-role="field-contain" class="required">';
 								//resHtml+='  <label for="oldname">';
@@ -415,7 +415,13 @@ $('#ftpConnections').live('pageshow',function(event, ui){
 //					resHtml += '</div>';
 
 					resHtml += '   <div data-role="collapsible" class="noautocollapse" toshow="false" data-theme="d" data-collapsed="true" class="home_collapsible_hidden ui-collapsible-contain">';
-					resHtml += '<h3><table width="100%" style="table-layout: fixed"><tr><td><a href="#folderbrowser" class="browseclass">'+this.connectionname+'</a></td><td><img class="showhideimage" alt="Edit" class="showhideimage" src="images/edit.gif"/></td><td><img class="removeclass" style="float:right" alt="Remove" src="images/remove.gif"/></td></tr></table></h3>';
+					resHtml += '<h3><table width="100%" style="table-layout: fixed"><tr><td width="65%"><a href="#folderbrowser" class="browseclass" title="'+this.connectionname+'">';
+					if(this.connectionname.length>17)
+						resHtml+=this.connectionname.substring(0,11)+'..'+this.connectionname.substring(this.connectionname.length-4);
+					else
+					resHtml+=this.connectionname;
+					resHtml += '</a></td><td width="20%"><img class="showhideimage" title="Edit" class="showhideimage" src="images/edit.gif"/>';
+						resHtml += '</td><td width="15%"><img class="removeclass" style="float:right" title="Remove" src="images/remove.gif"/></td></tr></table></h3>';
 					resHtml += '<form action="" class="addFtpAccountForm" method="post">';
 					resHtml += '<div data-role="field-contain" class="required">';
 					resHtml += '<label for="connectionname">Connection Name</label>';
