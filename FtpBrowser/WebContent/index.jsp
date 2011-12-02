@@ -85,6 +85,7 @@
             <div data-role="header">
                 <h1>Your Connections</h1>
 	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
+	<a href="index.jsp#ftpFavourites" data-icon="star">Favourites</a>
             </div>
             
             <div class="content" data-role="content" >
@@ -127,6 +128,7 @@
 		<header data-role="header">
 		  <h1 id="currentdirh3">Browser</h1>
 		  	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
+		  	<a href="index.jsp#ftpFavourites" data-icon="star">Favourites</a>
 		  		</header>
 		<div data-role="content">
 			 
@@ -157,6 +159,24 @@
 				</div>
 		</div>
 	</div>
+	
+	 <div id="ftpFavourites" data-role="page">
+ <a href="" id="suserID" title="" ></a>
+ 
+            <div data-role="header">
+                <h1>Favourite Folder</h1>
+	<a href="index.jsp#ftpConnections" data-icon="back" onclick="">Connections</a>
+            </div>
+            
+            <div class="content" data-role="content" >
+            			<div data-role="collapsible-set" class="home_collapsibles" id="favourites_list">
+            			
+                    </div>
+          
+
+            
+            <div id="errorDiv"></div>  
+            </div></div>
 
 <script type="text/javascript">
     $(document).ready( function(){

@@ -1,12 +1,20 @@
 package it.unibz.util;
 
+
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.SocketException;
 import java.util.ArrayList;
+
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.jibble.simpleftp.SimpleFTP;
 
 public class FTPConnectionManager {
 
@@ -15,6 +23,11 @@ private String user=null;
 private String pass=null;
 private String hostname=null;
 private int port=21;
+private String connectionname=null;
+
+	public FTPConnectionManager(String conname){
+		this.setConnectionname(conname);
+	}
 
 	public void doConnection(String user, String pass, String hostname,int port){
 		this.user=user;
@@ -22,6 +35,8 @@ private int port=21;
 		this.hostname=hostname;
 		this.port=port;
 		client = new FTPClient();
+		
+
 		try {
 			login();
 //			if (login) {
@@ -41,56 +56,48 @@ private int port=21;
 
 	private boolean login() throws SocketException, IOException {
 		client.connect(this.hostname,this.port);
+		//client.connect(hostname)
+		try {
+			client.setFileType(FTP.BINARY_FILE_TYPE);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		return client.login(this.user, this.pass);
 	}
 
-	public boolean downloadFile(String currentFolder,String filename,String temppath){
+	public boolean downloadFile(String currentFolder,String filename,String temppath) throws SocketException, IOException{
 
-		FileOutputStream fos = null;
+		InputStream fis = null;
 
         try {
+        	//this is indeed not working. A bug
     		if(!client.isConnected())
     			login();
+    		
             //
             // The remote filename to be downloaded.
             //
-            fos = new FileOutputStream(temppath+filename);
+            fis = client.retrieveFileStream(currentFolder+"/" +filename);
+            
+            File f = new File(temppath+filename);
+           // new FileOutputStream(temppath+filename);
 
             //
             // Download file from FTP server
             //
-            client.retrieveFile(currentFolder+"/" +filename, fos);
+            	DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(f)));
+    			int c;
+    			while((c = fis.read()) != -1) {
+    				out.writeByte(c);
+    			}
+    			fis.close();
+    			out.close();
+    		
         } catch (IOException e) {
-            e.printStackTrace();
-        	return false;
-        } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return true; 
-
-	}
-	
-	public boolean uploadFile(String currentFolder,String filename,FileInputStream fis){
-
-
-        try {
-    		if(!client.isConnected())
-    			login();
-            //
-            // The remote filename to be downloaded.
-            //
-
-    	    client.storeFile(currentFolder+"/"+filename, fis);
-    	    fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        	return false;
+            //Invoke yourself to reconnect
+        	login();
+        	downloadFile(currentFolder, filename, temppath);
         } finally {
             try {
                 if (fis != null) {
@@ -102,6 +109,32 @@ private int port=21;
         }
         return true; 
 
+	}
+	
+	public boolean uploadFile(String currentFolder,String filename,InputStream localFile) throws SocketException, IOException{
+
+		try {
+			//Using external library for avoiding Bug in Apache's FTPClient which
+			//dows not allow binary upload on windows ftp servers
+			
+		    SimpleFTP ftp = new SimpleFTP();
+		    // ReConnect to FTP server
+		    ftp.connect(hostname, port, user, pass);
+		    // Set binary mode.
+		    ftp.bin();
+		    // Change to a new working directory on the FTP server.
+		    ftp.cwd(currentFolder);
+		    // Upload the file
+		    ftp.stor(localFile,filename);
+		    // Quit from the FTP server.
+		    ftp.disconnect();
+		}
+		catch (IOException e) {
+			//invoke ourselfs
+			login();
+			uploadFile(currentFolder, filename, localFile);
+		}
+	        return true; 
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -125,20 +158,21 @@ private int port=21;
 		return files;
 	}
 
-	public boolean renameFile(String from, String to){
+	public boolean renameFile(String from, String to) throws SocketException, IOException{
 		boolean renamed = false;
 		try {
 			if(!client.isConnected())
 				login();
 			renamed = client.rename(from, to);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//invoke ourselves
+			login();
+			renameFile(from, to);
 		}
 		return renamed;
 	}
 
-	public boolean deleteItem(String filename,boolean isfolder) {
+	public boolean deleteItem(String filename,boolean isfolder) throws SocketException, IOException {
 		boolean deleted = false;
 		try {
 			if(!client.isConnected())
@@ -148,47 +182,58 @@ private int port=21;
 				else
 			deleted = client.deleteFile(filename);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//invoke ourselves
+			login();
+			deleteItem(filename, isfolder);
 		}
 		return deleted;
 	}
 
-	public boolean makeDirectory(String dirname){
+	public boolean makeDirectory(String dirname) throws SocketException, IOException{
 		boolean created = false;
 		try {
 			if(!client.isConnected())
 				login();
 				created=client.makeDirectory(dirname);
 						} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+							//invoke ourselves
+							login();
+							makeDirectory(dirname);
 		}
 		return created;
 	}
 	
 	public void removeConnection(){
 		try {
+			if(client!=null){
 			client.logout();
-			client.disconnect();
+			client.disconnect();}
 			//System.out.println("Disconnected");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 
-	public boolean renameFileOrDir(String currentfolder, String oldname, String newname) {
+	public boolean renameFileOrDir(String currentfolder, String oldname, String newname) throws SocketException, IOException {
 		boolean renamed = false;
 		try {
 			if(!client.isConnected())
 				login();
 			renamed=client.rename(currentfolder+"/"+oldname,currentfolder+"/"+newname);
 						} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+							//invoke ourselves
+							login();
+renameFileOrDir(currentfolder, oldname, newname);		}
 		return renamed;
+	}
+
+	public String getConnectionname() {
+		return connectionname;
+	}
+
+	public void setConnectionname(String connectionname) {
+		this.connectionname = connectionname;
 	}
 }
 

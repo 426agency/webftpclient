@@ -16,14 +16,14 @@ public class FtpConnectionBean
 	public void setConnectionname(String connectionname) {
 		this.connectionname = connectionname;
 	}
-	int userID;
+	private int userID;
 	public int getUserID() {
 		return userID;
 	}
 	public void setUserID(int userID) {
 		this.userID = userID;
 	}
-	int port=21;
+	private int port=21;
 	
 	public String getUsername() {
 		return username;

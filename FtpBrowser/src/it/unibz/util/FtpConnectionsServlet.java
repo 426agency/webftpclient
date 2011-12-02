@@ -1,11 +1,11 @@
 package it.unibz.util;
 
+import it.unibz.controller.FavouritesDAO;
 import it.unibz.controller.FtpConnectionDAO;
 import it.unibz.model.FtpConnectionBean;
 import it.unibz.model.UserBean;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -75,13 +75,14 @@ public class FtpConnectionsServlet extends HttpServlet
   	      else
   	        fileName = optionalFileName;
 
-String path=getServletContext().getRealPath("temp")+(getServletContext().getRealPath("temp").contains("/")?"/":"\\");
-  	      File saveTo = new File(path + fileName);
+  	      //String path=getServletContext().getRealPath("temp")+(getServletContext().getRealPath("temp").contains("/")?"/":"\\");
+  	      //File saveTo = new File(path + fileName);
   	      
-  	        fileItem.write(saveTo);
-  	    FileInputStream fis = new FileInputStream(saveTo.getAbsolutePath());
+  	       //fileItem.write(saveTo);
+  	        
     				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
-    				boolean result =ftpconmgr.uploadFile(s.getAttribute("currentfolder").toString(),fileName, fis);
+    				
+    				boolean result =ftpconmgr.uploadFile(s.getAttribute("currentfolder").toString(),fileName,fileItem.getInputStream());
   	      	if(result){
     				ret+= "<div id=\"status\">success</div>";
   	  			ret+="<div id=\"message\">Successfully Uploaded</div>";
@@ -155,19 +156,31 @@ return;
   				String connectionname=request.getParameter("connectionname");
   				HttpSession ss = request.getSession();
   				FTPConnectionManager ftpconmgr=null;
-  				if(!connectionname.equals("/")){
+  				//First check if no connectionname
+  				if(ss.getAttribute("connectionmanager")==null){
   					//ss.setAttribute("connectionname", connectionname);
-    				//Create Connectionmanager only once per user
     				FtpConnectionBean cb=dao.getItem(user.getID(),connectionname);
-  					ftpconmgr= new FTPConnectionManager();
+  					ftpconmgr= new FTPConnectionManager(connectionname);
     				ftpconmgr.doConnection(cb.getUsername(),cb.getPassword(),cb.getHost(),cb.getPort());
     				ss.setAttribute("connectionmanager", ftpconmgr);
     				ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
   				}
   				else{
-  					//connectionname=(String)ss.getAttribute("connectionname");
   					ftpconmgr=(FTPConnectionManager)ss.getAttribute("connectionmanager");
+  				}
+  				//now check if connection still the same
+  				if(ftpconmgr.getConnectionname().equals(connectionname)||connectionname.equals("/")){
   					ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
+  				}
+  				else{
+  					//Disconnect and create new  					
+  					ftpconmgr.removeConnection();
+  					FtpConnectionBean cb=dao.getItem(user.getID(),connectionname);
+  					//ftpconmgr= new FTPConnectionManager(connectionname);
+  					ftpconmgr.setConnectionname(connectionname);
+    				ftpconmgr.doConnection(cb.getUsername(),cb.getPassword(),cb.getHost(),cb.getPort());
+    				ss.setAttribute("connectionmanager", ftpconmgr);
+    				ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
   				}
   				
   				
@@ -207,6 +220,24 @@ return;
   			    response.getOutputStream().println(ftpconmgr.downloadFile((String)request.getParameter("currentfolder"),filename,getServletContext().getRealPath("temp")+(getServletContext().getRealPath("temp").contains("/")?"/":"\\"))?"success":"fail");
   	  			
   				
+  			}
+  			if(activity.equals("getallfavourites")){
+
+  				response.setContentType("text/html;charset=UTF-8");
+
+  	      FavouritesDAO catalog = new FavouritesDAO();
+  	      ArrayList catalogItems=null;
+  	    	if(user!=null)
+  	    		catalogItems = catalog.getItems(user.getID());
+  	    	else
+  	      	catalogItems= new ArrayList();
+
+  	      String callback = request.getParameter("callback");
+  	      request.setAttribute("favourites", catalogItems);
+  	      request.setAttribute("callback", callback);
+  	      
+  	      RequestDispatcher dispatcher = request.getRequestDispatcher("favouritesJSon.jsp");
+  	      dispatcher.include(request, response);
   			}
   		}
   		

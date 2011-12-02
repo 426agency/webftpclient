@@ -97,9 +97,23 @@ htb.CreateFtp={
 			});
 
 			$('.browseclass').bind('click', function (evt) { 
+				//alert($(this).attr('title'));
+				
+				//alert($(this).attr('connectionname'));
 				//alert($(this).parent().children('em').html());
 				//alert($(this).parent().children('em').html());
-				$("#ftpfoldercontentid").attr('connectionname',$(this).attr('title'));
+				if($(this).attr('currentfolder'))
+					//alert($(this).attr('currentfolder'));
+					{
+					//Its a favourite,treat it as it
+					$("#ftpfoldercontentid").attr('connectionname',$(this).attr('connectionname'));
+					$("#ftpfoldercontentid").attr('currentfolder',$(this).attr('currentfolder'));
+					}
+				else{
+					$("#ftpfoldercontentid").attr('connectionname',$(this).attr('title'));
+					}
+				alert($("#ftpfoldercontentid").attr('connectionname'));
+				//alert($(this).attr('title'));*/
 				window.location="/FtpBrowser/index.jsp#folderbrowser";
 
 			});
@@ -247,7 +261,7 @@ $.ajax({type:'POST',
 				//$.download('FtpConnectionsServlet','activity=downloadfile&currentfolder='+$("#ftpfoldercontentid").attr('currentfolder')+'filename='+$.trim($(this).html()) );
 			});
 			$('.mainfolderclass').bind('click', function (evt) { 
-				if($("#ftpfoldercontentid").attr('currentfolder')==''){
+				if(!$("#ftpfoldercontentid").attr('currentfolder')){
 					var resHtml = '';
 					$("#ftpfoldercontentid").html(resHtml);
 					// $('div[data-role=collapsible]').collapsible();
@@ -259,7 +273,7 @@ $.ajax({type:'POST',
 				else{
 					var temp=$("#ftpfoldercontentid").attr('currentfolder');
 					temp=temp.substring(temp,temp.lastIndexOf('/'));
-					//alert(temp);
+					alert(temp);
 					$("#ftpfoldercontentid").attr('currentfolder',temp);
 					//$("#currentdirh3").html(temp);
 					//alert($("#ftpfoldercontentid").attr('currentfolder'));
@@ -276,6 +290,7 @@ function ref(){
 }
 
 refreshFolders={refresh:function(){
+	alert($("#ftpfoldercontentid").attr('connectionname'));
 	$("#uploaddiv").trigger("collapse");
 
 	$.mobile.showPageLoadingMsg();
@@ -326,7 +341,8 @@ refreshFolders={refresh:function(){
 										resHtml+='            <input type="hidden" name="oldname" value="'+this.itemname+'"/>';
 											
 												resHtml+='</form><button data-role="button" class="removefolderclass" itemtype="'+this.typename+'" itemname="'+this.itemname+'" data-theme="b">Remove</button>';
-												resHtml+='<button data-role="button" class="favouritefolderclass" itemtype="'+this.typename+'" itemname="'+this.itemname+'" data-theme="b">Add to favourites</button>';	
+												if(this.typename==1)
+													resHtml+='<button data-role="button" class="favouritefolderclass" itemtype="'+this.typename+'" itemname="'+this.itemname+'" data-theme="b">Add to favourites</button>';	
 												resHtml+='</div>';
 				
 				
@@ -461,6 +477,72 @@ $('#ftpConnections').live('pageshow',function(event, ui){
 
 			resHtml += '</div>';
 			$("#ftpConnections_list").html(resHtml);
+			$('div[data-role=collapsible]').collapsible();
+			htb.CreateFtp.setup();
+			refreshdivs.refresh();
+
+
+			// $('#ftpConnections_list')..listview('refresh');
+		}
+	});
+
+});
+
+$('#ftpFavourites').live('pageshow',function(event, ui){
+
+	$.ajax({
+		type: 'POST',
+		url: 'FtpConnectionsServlet?activity=getallfavourites&callback=?',
+		dataType: 'json',
+		cache: false,
+		error: function(jqXHR, textStatus, errorThrown){
+			window.location="/FtpBrowser/index.jsp";
+		},
+		success: function(data, textStatus){
+			resHtml = '<div id="test">';
+			$.each(data.items, function() {
+				if (this != '') {
+//					resHtml += '<div data-role="collapsible">';
+//					resHtml += '  <h3>Im a header</h3>';
+//					resHtml += '  <p>Im the collapsible content. By default Im closed, but you can click the header to open me.</p>';
+//					resHtml += '</div>';
+
+					resHtml += '   <div data-role="collapsible" class="noautocollapse" toshow="false" data-theme="d" data-collapsed="true" class="home_collapsible_hidden ui-collapsible-contain">';
+					resHtml += '<h3><table width="100%" style="table-layout: fixed"><tr><td width="65%"><a href="" class="browseclass" currentfolder="'+this.folderpath+'" connectionname="'+this.connectionname+'" title="'+
+					this.folderpath+' @ '+this.connectionname+'">';
+					resHtml += this.folderpath.substring(this.folderpath.lastIndexOf('/')+1);
+					/*if(this.connectionname.length>17)
+						resHtml+=this.connectionname.substring(0,11)+'..'+this.connectionname.substring(this.connectionname.length-4);
+					else
+					resHtml+=this.connectionname;*/
+					resHtml += '</a></td><td width="20%"><img class="showhideimage" title="Info" class="showhideimage" src="images/info.gif"/>';
+						resHtml += '</td><td width="15%"><img class="removeclass" style="float:right" title="Remove" src="images/remove.gif"/></td></tr></table></h3>';
+					resHtml += '<form action="" class="" method="post">';
+					resHtml += '<div data-role="field-contain" class="required">';
+					resHtml += '<label for="connectionname">Connection Name</label>';
+					resHtml += '<input type="text" name="connectionname" readonly="readonly" value="'+this.connectionname+'" class="text-box"  />            </div>';
+					resHtml += '<div data-role="field-contain" class="required">';
+					resHtml += '<label for="folderpath">Full path</label>';
+					resHtml += '<input type="text" name="folderpath" readonly="readonly" value="'+this.folderpath+'" class="text-box"  />            </div>';
+					
+
+					resHtml += '</form>';
+					
+						resHtml += '</div>';
+
+
+
+//					resHtml += '<li>';
+//					resHtml += ' <a href="#ftpconnection"
+//					onClick="curConnection=\''+this.host+'\'">';
+//					resHtml += ' <h3>'+this.host+'</h3>';
+//					resHtml += '    </a>';
+//					resHtml += '</li>';
+				}
+			});
+
+			resHtml += '</div>';
+			$("#favourites_list").html(resHtml);
 			$('div[data-role=collapsible]').collapsible();
 			htb.CreateFtp.setup();
 			refreshdivs.refresh();
