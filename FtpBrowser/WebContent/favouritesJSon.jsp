@@ -5,6 +5,7 @@ ${callback}(<json:object>
     <json:object>
       <json:property name="folderpath" value="${item.folderPATH}"/>
       <json:property name="connectionname" value="${item.connectionNAME}"/>
+      <json:property name="connectionid" value="${item.connectionID}"/>
     </json:object>
   </json:array>
 </json:object>)

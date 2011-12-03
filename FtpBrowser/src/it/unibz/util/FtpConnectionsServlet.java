@@ -2,6 +2,7 @@ package it.unibz.util;
 
 import it.unibz.controller.FavouritesDAO;
 import it.unibz.controller.FtpConnectionDAO;
+import it.unibz.model.FavouriteBean;
 import it.unibz.model.FtpConnectionBean;
 import it.unibz.model.UserBean;
 
@@ -35,12 +36,12 @@ public class FtpConnectionsServlet extends HttpServlet
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
    * @param request servlet request
    * @param response servlet response
-   * @throws ServletException if a servlet-specific error occurs
-   * @throws IOException if an I/O error occurs
+	 * @throws IOException 
+	 * @throws ServletException 
+	 * @throws Exception if no ftp connection
    */
   @SuppressWarnings("rawtypes")
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-  throws ServletException, IOException {
+	protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
   	HttpSession s = 	request.getSession();
  // controlliamo se la request che è stata
  // effettuata contiene o meno un file
@@ -75,14 +76,15 @@ public class FtpConnectionsServlet extends HttpServlet
   	      else
   	        fileName = optionalFileName;
 
-  	      //String path=getServletContext().getRealPath("temp")+(getServletContext().getRealPath("temp").contains("/")?"/":"\\");
-  	      //File saveTo = new File(path + fileName);
+  	        String path=getServletContext().getRealPath("temp")+(getServletContext().getRealPath("temp").contains("/")?"/":"\\");
+  	        File saveTo = new File(path + fileName);
   	      
-  	       //fileItem.write(saveTo);
+  	        fileItem.write(saveTo);
   	        
     				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
     				
-    				boolean result =ftpconmgr.uploadFile(s.getAttribute("currentfolder").toString(),fileName,fileItem.getInputStream());
+    				boolean result =ftpconmgr.uploadFile(s.getAttribute("currentfolder").toString(),fileName,saveTo.getAbsolutePath());
+    				fileItem.delete();
   	      	if(result){
     				ret+= "<div id=\"status\">success</div>";
   	  			ret+="<div id=\"message\">Successfully Uploaded</div>";
@@ -161,7 +163,11 @@ return;
   					//ss.setAttribute("connectionname", connectionname);
     				FtpConnectionBean cb=dao.getItem(user.getID(),connectionname);
   					ftpconmgr= new FTPConnectionManager(connectionname);
+  					try{
     				ftpconmgr.doConnection(cb.getUsername(),cb.getPassword(),cb.getHost(),cb.getPort());
+    				}
+  					catch (Exception e) {
+throw new IOException("No connection possible");						}
     				ss.setAttribute("connectionmanager", ftpconmgr);
     				ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
   				}
@@ -170,7 +176,7 @@ return;
   				}
   				//now check if connection still the same
   				if(ftpconmgr.getConnectionname().equals(connectionname)||connectionname.equals("/")){
-  					ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
+  					ss.setAttribute("currentfolder", request.getParameter("currentfolder")==""?"/": request.getParameter("currentfolder"));
   				}
   				else{
   					//Disconnect and create new  					
@@ -178,7 +184,11 @@ return;
   					FtpConnectionBean cb=dao.getItem(user.getID(),connectionname);
   					//ftpconmgr= new FTPConnectionManager(connectionname);
   					ftpconmgr.setConnectionname(connectionname);
+  					try{
     				ftpconmgr.doConnection(cb.getUsername(),cb.getPassword(),cb.getHost(),cb.getPort());
+    				}
+  					catch (Exception e) {
+throw new IOException("No connection possible");	}
     				ss.setAttribute("connectionmanager", ftpconmgr);
     				ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
   				}
@@ -238,6 +248,47 @@ return;
   	      
   	      RequestDispatcher dispatcher = request.getRequestDispatcher("favouritesJSon.jsp");
   	      dispatcher.include(request, response);
+  			}
+  			if(activity.equals("removeFavourite")){
+  				FavouritesDAO dao =  new FavouritesDAO();
+  				FavouriteBean cb = new FavouriteBean();
+  				try{
+  				cb.setConnectionID(Integer.parseInt(request.getParameter("connectionid")));
+  				}
+  				catch (Exception e) {
+  					response.getOutputStream().println("fail");
+  				}
+  				cb.setUserID(user.getID());
+  				cb.setFolderPATH(request.getParameter("currentFolder"));
+  				response.getOutputStream().println(dao.removeFavorite(cb)?"success":"fail");
+  				
+  			}
+  			if(activity.equals("removeInlineFavourite")){
+  				FavouritesDAO dao =  new FavouritesDAO();
+  				FavouriteBean cb = new FavouriteBean();
+  				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
+  				cb.setConnectionNAME(ftpconmgr.getConnectionname());
+  				cb.setUserID(user.getID());
+  				cb.setFolderPATH(request.getParameter("filename"));
+  				response.getOutputStream().println(dao.removeFavoriteByConnectionname(cb)?"success":"fail");
+  			}
+  			if(activity.equals("addFavourite")){
+  				FavouriteBean cb = new FavouriteBean();
+  				cb.setFolderPATH(request.getParameter("itemname"));
+  				cb.setUserID(user.getID());
+  				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
+  				cb.setConnectionNAME(ftpconmgr.getConnectionname());
+  				FavouritesDAO dao =  new FavouritesDAO();
+  				response.getOutputStream().println(dao.addFavourite(cb)?"success":"fail");
+  			}
+  			if(activity.equals("isfavourite")){
+  				FavouriteBean cb = new FavouriteBean();
+  				cb.setFolderPATH(request.getParameter("filename"));
+  				cb.setUserID(user.getID());
+  				FTPConnectionManager ftpconmgr=(FTPConnectionManager)request.getSession().getAttribute("connectionmanager");
+  				cb.setConnectionNAME(ftpconmgr.getConnectionname());
+  				FavouritesDAO dao =  new FavouritesDAO();
+  				response.getOutputStream().println(dao.checkFavourite(cb)?"yes":"no");
   			}
   		}
   		

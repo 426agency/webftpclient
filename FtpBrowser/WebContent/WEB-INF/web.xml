@@ -24,4 +24,5 @@
         <param-name>filesDir</param-name>
         <param-value>/temp/</param-value>
     </context-param>
+    <session-config> <session-timeout>30</session-timeout> </session-config> 
 </web-app>

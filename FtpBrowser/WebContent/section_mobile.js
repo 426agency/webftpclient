@@ -83,11 +83,16 @@ htb.CreateFtp={
 
 			$('.removeclass').bind('click', function (evt) { 
 				//alert($(this).parent().children('em').html());
-				$.ajax({type:'POST',url:'FtpConnectionsServlet',data:'activity=removeConnection&connectionname='+$(this).html(),
+				$.ajax({type:'POST',url:'FtpConnectionsServlet',data:'activity=removeConnection&connectionname='+$(this).attr("connectionname"),
 					success:function(data){
 						$.mobile.hidePageLoadingMsg();
+						data=$.trim(data);
+						if(data=="fail"){
+							alert("You have probably a favourite folder connected to the item! Remove it first!");
+						}
+						else{
 						window.location="/FtpBrowser/index.jsp#ftpConnections";
-						location.reload();
+						location.reload();}
 					},
 					error:function(data){
 						alert("Looks like we can't find the server, please try again.");
@@ -96,6 +101,21 @@ htb.CreateFtp={
 
 			});
 
+			$('.removefavouriteclass').bind('click', function (evt) { 
+				//alert($(this).parent().children('em').html());
+				$.ajax({type:'POST',url:'FtpConnectionsServlet',data:'activity=removeFavourite&connectionid='+$(this).attr("connectionid")+'&currentFolder='+$(this).attr("currentfolder"),
+					success:function(data){
+						$.mobile.hidePageLoadingMsg();
+						window.location="/FtpBrowser/index.jsp#ftpFavourites";
+						location.reload();
+					},
+					error:function(data){
+						alert("Looks like we can't find the server, please try again.");
+						$.mobile.hidePageLoadingMsg();
+					}});
+
+			});
+			
 			$('.browseclass').bind('click', function (evt) { 
 				//alert($(this).attr('title'));
 				
@@ -112,7 +132,7 @@ htb.CreateFtp={
 				else{
 					$("#ftpfoldercontentid").attr('connectionname',$(this).attr('title'));
 					}
-				alert($("#ftpfoldercontentid").attr('connectionname'));
+				//alert($("#ftpfoldercontentid").attr('connectionname'));
 				//alert($(this).attr('title'));*/
 				window.location="/FtpBrowser/index.jsp#folderbrowser";
 
@@ -219,6 +239,48 @@ htb.CreateFolder={
 				//refreshFolders.refresh();
 				//alert("Not implemented yet");
 			});
+			$('.favouritefolderclass').bind('click', function (evt) { 
+				//$("#ftpfoldercontentid").attr('currentfolder',$("#ftpfoldercontentid").attr('currentfolder')+'/'+$.trim($(this).html()));
+
+				//ADDITIONAL CHECK FOR CONCURRENT TRIGGERS
+				if($(this).attr("class")=="favouritefolderclass"){
+				$.ajax({type:'POST',
+					
+					url:'FtpConnectionsServlet',data:'activity=addFavourite&itemname='+
+					$("#ftpfoldercontentid").attr('currentfolder')+'/'+$(this).attr('itemname'),
+					success:function(data){
+						data=$.trim(data);
+						if(data=='fail'){
+							alert("There was an error adding folder to Favourites!");
+						}
+						else{
+							refreshFolders.refresh();
+						}
+
+					},
+					error:function(data){
+						alert("Looks like we can't find the server, please try again.");
+						$.mobile.hidePageLoadingMsg();
+					}});
+				}
+				//refreshFolders.refresh();
+				//alert("Not implemented yet");
+			});
+			$('.removeInlinefavoriteclass').bind('click', function (evt) { 
+				//alert($(this).parent().children('em').html());
+				alert("exec");
+				$.ajax({type:'POST',url:'FtpConnectionsServlet',data:'activity=removeInlineFavourite&filename='+$("#ftpfoldercontentid").attr('currentfolder')+'/'+$(this).attr('itemname'),
+					success:function(data){
+						$.mobile.hidePageLoadingMsg();
+						refreshFolders.refresh();
+					},
+					error:function(data){
+						alert("Looks like we can't find the server, please try again.");
+						$.mobile.hidePageLoadingMsg();
+					}});
+
+			});
+			
 			$('.folderclass').bind('click', function (evt) { 
 				var filename=$.trim($(this).attr("filename"));
 
@@ -273,7 +335,7 @@ $.ajax({type:'POST',
 				else{
 					var temp=$("#ftpfoldercontentid").attr('currentfolder');
 					temp=temp.substring(temp,temp.lastIndexOf('/'));
-					alert(temp);
+					//alert(temp);
 					$("#ftpfoldercontentid").attr('currentfolder',temp);
 					//$("#currentdirh3").html(temp);
 					//alert($("#ftpfoldercontentid").attr('currentfolder'));
@@ -290,7 +352,7 @@ function ref(){
 }
 
 refreshFolders={refresh:function(){
-	alert($("#ftpfoldercontentid").attr('connectionname'));
+	//alert($("#ftpfoldercontentid").attr('connectionname'));
 	$("#uploaddiv").trigger("collapse");
 
 	$.mobile.showPageLoadingMsg();
@@ -401,8 +463,40 @@ var thisdiv=$(this).closest(".noautocollapse");
 	$('.noautocollapse').bind('click', function (evt) { 
 		if($(this).attr("toshow")=="false")
            $(this).trigger("collapse");
-		else
+		else{
+			
+			//Change folder favourtie state appropriately
+			var favouritebutton=$(this).find(".favouritefolderclass");
+			if(favouritebutton.html()!=null){
+				//now call post to check if we have to change favourite attribute
+				$.ajax({type:'POST',
+					
+					url:'FtpConnectionsServlet',data:'activity=isfavourite&filename='+$("#ftpfoldercontentid").attr('currentfolder')+favouritebutton.attr("itemname"),
+					success:function(data){
+						data=$.trim(data);
+
+							if(data=='yes')
+									{
+								favouritebutton.removeClass("favouritefolderclass").addClass("removeInlinefavoriteclass");
+								
+								favouritebutton.html("Remove from Favourites");
+								//alert(favouritebutton.attr("class"));
+								htb.CreateFolder.setup();
+								}
+
+						
+
+					},
+					error:function(data){
+						alert("Looks like we can't find the server, please try again.");
+						$.mobile.hidePageLoadingMsg();
+					}});
+			}
+			//alert($(this).parent().children(".ui-collapsible-content").html());
+			
+			
 			$(this).trigger("expand");
+		}
 	});	
 	}};
 
@@ -437,7 +531,7 @@ $('#ftpConnections').live('pageshow',function(event, ui){
 					else
 					resHtml+=this.connectionname;
 					resHtml += '</a></td><td width="20%"><img class="showhideimage" title="Edit" class="showhideimage" src="images/edit.gif"/>';
-						resHtml += '</td><td width="15%"><img class="removeclass" style="float:right" title="Remove" src="images/remove.gif"/></td></tr></table></h3>';
+						resHtml += '</td><td width="15%"><img class="removeclass" connectionname="'+this.connectionname+'" style="float:right" title="Remove" src="images/remove.gif"/></td></tr></table></h3>';
 					resHtml += '<form action="" class="addFtpAccountForm" method="post">';
 					resHtml += '<div data-role="field-contain" class="required">';
 					resHtml += '<label for="connectionname">Connection Name</label>';
@@ -516,7 +610,7 @@ $('#ftpFavourites').live('pageshow',function(event, ui){
 					else
 					resHtml+=this.connectionname;*/
 					resHtml += '</a></td><td width="20%"><img class="showhideimage" title="Info" class="showhideimage" src="images/info.gif"/>';
-						resHtml += '</td><td width="15%"><img class="removeclass" style="float:right" title="Remove" src="images/remove.gif"/></td></tr></table></h3>';
+						resHtml += '</td><td width="15%"><img class="removefavouriteclass" style="float:right" currentfolder="'+this.folderpath+'" connectionid="'+this.connectionid+'" title="Remove" src="images/remove.gif"/></td></tr></table></h3>';
 					resHtml += '<form action="" class="" method="post">';
 					resHtml += '<div data-role="field-contain" class="required">';
 					resHtml += '<label for="connectionname">Connection Name</label>';
