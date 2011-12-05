@@ -117,7 +117,7 @@ private String connectionname=null;
 				files.add(new MyFTPFile(file));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 		}
 		
 		
