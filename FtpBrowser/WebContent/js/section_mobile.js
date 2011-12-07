@@ -8,7 +8,7 @@ $(document).ready(function(){
 var htb={};
 
 //Logout link catcher
-htb.Logout={setup:function(){var logout=$('.logoutlink').click(
+htb.Logout={setup:function(){logout=$('.logoutlink').click(
 		function(){
 			$.ajax({type:'POST',url:'LoginServlet',data:'logout=true',
 				success:function(data){
@@ -24,7 +24,7 @@ htb.Logout={setup:function(){var logout=$('.logoutlink').click(
 
 //Login link catcher
 htb.Login={setup:function(){
-	var login=$('#loginForm').validate({
+	login=$('#loginForm').validate({
 		rules:{login:"required",password:"required"},messages:{login:{required:"Required"},password:{required:"Required"}},
 		submitHandler:function(form){htb.Login.submit();},
 		invalidHandler:function(form,validator){alert("Email/Password Required");},
@@ -41,7 +41,7 @@ htb.Login={setup:function(){
 //Signup link catcher
 htb.Signup={
 		setup:function(){
-			var signup=$('#signupForm').validate(
+			signup=$('#signupForm').validate(
 					{rules:{username:"required",password:{required:true,minlength:4}},
 						messages:{username:{required:"Required"},password:{required:"4 characters minimum",minlength:"4 characters minimum"}},
 						submitHandler:function(form){htb.Signup.submit();return false;},
@@ -141,6 +141,22 @@ htb.CreateFtp={
 		}};
 
 
+htb.RefreshFavourites={setup:function(){
+	//Catch remove favourites inline button click
+	$('.removeInlinefavoriteclass').bind('click', function (evt) { 
+		$.ajax({type:'POST',url:'FtpConnectionsServlet',data:'activity=removeInlineFavourite&filename='+$("#ftpfoldercontentid").attr('currentfolder')+'/'+$(this).attr('itemname'),
+			success:function(data){
+				$.mobile.hidePageLoadingMsg();
+				refreshFolders.refresh();
+			},
+			error:function(data){
+				alert("Looks like we can't find the server, please try again.");
+				$.mobile.hidePageLoadingMsg();
+			}});
+
+	});
+}};
+
 //Group of functions to run at initialization for FTP Folder Browsing
 htb.CreateFolder={
 		setup:function(){
@@ -173,8 +189,8 @@ htb.CreateFolder={
 			});
 			//Catch add Rename Form submission
 			$('.renameForm').each( function(){
-
 				var form = $(this);
+
 				form.validate(
 
 						{rules:{renamename:"required"},
@@ -182,7 +198,7 @@ htb.CreateFolder={
 
 							submitHandler:function(){
 								$.mobile.showPageLoadingMsg();
-								$.ajax({type:'POST',url:'FtpConnectionsServlet?currentfolder='+$("#ftpfoldercontentid").attr('currentfolder'),data:form.serialize(),
+								$.ajax({type:'POST',url:'FtpConnectionsServlet?currentfolder='+$("#ftpfoldercontentid").attr('currentfolder')+'&itemtype='+form.attr('itemtype'),data:form.serialize(),
 									success:function(data){
 										data=$.trim(data);if(data=='fail')
 										{alert("There was an error, probably another directory/file with that name already exist!");}
@@ -199,6 +215,7 @@ htb.CreateFolder={
 			});
 			//Catch remove button click
 			$('.removefolderclass').bind('click', function (evt) { 
+
 				//CALL servlet for removal attempt
 				$.ajax({type:'POST',
 
@@ -245,19 +262,7 @@ htb.CreateFolder={
 						}});
 				}
 			});
-			//Catch remove favourites inline button click
-			$('.removeInlinefavoriteclass').bind('click', function (evt) { 
-				$.ajax({type:'POST',url:'FtpConnectionsServlet',data:'activity=removeInlineFavourite&filename='+$("#ftpfoldercontentid").attr('currentfolder')+'/'+$(this).attr('itemname'),
-					success:function(data){
-						$.mobile.hidePageLoadingMsg();
-						refreshFolders.refresh();
-					},
-					error:function(data){
-						alert("Looks like we can't find the server, please try again.");
-						$.mobile.hidePageLoadingMsg();
-					}});
 
-			});
 
 			//Catch folder name link click
 			$('.folderclass').bind('click', function (evt) { 
@@ -270,6 +275,7 @@ htb.CreateFolder={
 				$("#makedirdirname").val("");
 
 				refreshFolders.refresh();
+				
 
 			});
 
@@ -288,13 +294,29 @@ htb.CreateFolder={
 							alert("Error accessing temp folder!");
 						}
 						else{
-						    var opathname = window.location.toString();
+						    /*var opathname = window.location.toString();
 						     pathname=opathname.substring(0,opathname.indexOf("FtpBrowser/")+11);
 						     pathname+='resize.jsp?name='+filename+'&iframe=true&amp;width=60&amp;height=80';
 							//alert(pathname);
 							$('#myphoto').attr('href',pathname );
 						    $('#myphoto').trigger('click');
-						    window.location=opathname;
+						    window.location=opathname;*/
+							$("#ftpfoldercontentid").attr('currentfolder',$("#ftpfoldercontentid").attr('currentfolder')+'/'+filename);
+							resHtml = '<li><a class="mainfolderclass" href="#folderbrowser"  >..</a></li>';
+							resHtml+='<li>';
+							resHtml+='<iframe src="temp/'+filename+'" width="100%" height="100%" marginwidth="0" marginheight="0" frameborder="no"';
+							resHtml+=' scrolling="yes" style="border-width:2px; border-color:#333; background:#FFF; border-style:solid;"></iframe>';
+							resHtml+='</li>';
+							resHtml += '';
+							$("#ftpfoldercontentid").html(resHtml);
+							//$('div[data-role=collapsible]').collapsible();
+
+							htb.CreateFolder.setup();
+
+							$('#ftpfoldercontentid').listview('refresh');
+							$.mobile.hidePageLoadingMsg();
+							refreshdivs.refresh();
+							$('#tooldivs').hide();
 						}
 
 					},
@@ -323,6 +345,7 @@ htb.CreateFolder={
 					//$("#currentdirh3").html(temp);
 					//alert($("#ftpfoldercontentid").attr('currentfolder'));
 					refreshFolders.refresh();
+					$('#tooldivs').show();
 				}
 
 			});
@@ -374,7 +397,7 @@ refreshFolders={refresh:function(){
 					else
 						resHtml+=this.itemname;
 					resHtml+='</a></td><td width="20%"><img class="showhideimage" title="Edit" src="images/edit.gif"/></td></tr></table></h3>';
-					resHtml+='	<form action="" class="renameForm" method="post">';
+					resHtml+='	<form action="" itemtype="'+this.typename+'" class="renameForm" method="post">';
 					resHtml+=' <div data-role="field-contain" class="required">';
 
 					resHtml+='           <button data-role="button" data-theme="b">Rename to:</button>';
@@ -438,7 +461,7 @@ refreshdivs={refresh:function(){
 				//now call post to check if we have to change favourite attribute
 				$.ajax({type:'POST',
 
-					url:'FtpConnectionsServlet',data:'activity=isfavourite&filename='+$("#ftpfoldercontentid").attr('currentfolder')+favouritebutton.attr("itemname"),
+					url:'FtpConnectionsServlet',data:'activity=isfavourite&filename='+$("#ftpfoldercontentid").attr('currentfolder')+'/'+favouritebutton.attr("itemname"),
 					success:function(data){
 						data=$.trim(data);
 
@@ -448,7 +471,7 @@ refreshdivs={refresh:function(){
 
 							favouritebutton.html("Remove from Favourites");
 							//alert(favouritebutton.attr("class"));
-							htb.CreateFolder.setup();
+							htb.RefreshFavourites.setup();
 						}
 
 

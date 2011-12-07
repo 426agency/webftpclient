@@ -190,7 +190,8 @@ public class FtpConnectionsServlet extends HttpServlet
 
 			ArrayList catalogItems = null;
 			if (user != null) {
-				catalogItems = ftpconmgr.getFileList((String)ss.getAttribute("currentfolder"));
+				catalogItems = ftpconmgr.getFileList((String) ss
+						.getAttribute("currentfolder"));
 			} else
 				catalogItems = new ArrayList();
 			// ftpconmgr.removeConnection();
@@ -208,12 +209,21 @@ public class FtpConnectionsServlet extends HttpServlet
 		if (activity.equals("removeItem")) {
 			FTPConnectionManager ftpconmgr = (FTPConnectionManager) request
 					.getSession().getAttribute("connectionmanager");
-			response
-					.getOutputStream()
-					.println(
-							ftpconmgr.deleteItem((String) request.getParameter("itemname"),
-									((String) request.getParameter("itemtype")).equals("1")) ? "success"
-									: "fail");
+			String filename = (String) request.getParameter("itemname");
+			boolean isDir = ((String) request.getParameter("itemtype")).equals("1");
+			boolean ret=ftpconmgr.deleteItem(filename, isDir);
+			// If folder remove check if we have to remove also from favourites
+			if (ret&&isDir) {
+				FavouriteBean cb = new FavouriteBean();
+				cb.setFolderPATH(filename);
+				cb.setUserID(user.getID());
+				cb.setConnectionNAME(ftpconmgr.getConnectionname());
+				FavouritesDAO dao = new FavouritesDAO();
+				if (dao.checkFavourite(cb))
+					dao.removeFavoriteByConnectionname(cb);
+			}
+			response.getOutputStream().println(
+					ret ? "success" : "fail");
 		}
 		// Make new Directory
 		if (activity.equals("makedir")) {
@@ -230,13 +240,28 @@ public class FtpConnectionsServlet extends HttpServlet
 		if (activity.equals("renamename")) {
 			FTPConnectionManager ftpconmgr = (FTPConnectionManager) request
 					.getSession().getAttribute("connectionmanager");
+			
+			//Check if folder a favourite
+			boolean isDir = ((String) request.getParameter("itemtype")).equals("1");
+			// If folder remove check if we have to remove also from favourites
+			boolean ret=ftpconmgr.renameFileOrDir(
+					(String) request.getParameter("currentfolder"),
+					(String) request.getParameter("oldname"),
+					(String) request.getParameter("renamename"));
+					
+			if (ret&&isDir) {
+				FavouriteBean cb = new FavouriteBean();
+				cb.setFolderPATH((String) request.getParameter("currentfolder")+"/"+(String) request.getParameter("oldname"));
+				cb.setUserID(user.getID());
+				cb.setConnectionNAME(ftpconmgr.getConnectionname());
+				FavouritesDAO dao = new FavouritesDAO();
+				if (dao.checkFavourite(cb))
+					dao.changeFavouritePath(cb,(String) request.getParameter("currentfolder")+"/"+(String) request.getParameter("renamename"));
+			}
 			response.getOutputStream()
-					.println(
-							ftpconmgr.renameFileOrDir(
-									(String) request.getParameter("currentfolder"),
-									(String) request.getParameter("oldname"),
-									(String) request.getParameter("renamename")) ? "success"
-									: "fail");
+			.println(
+					ret ? "success"
+							: "fail");
 		}
 		// Download file
 		if (activity.equals("downloadfile")) {

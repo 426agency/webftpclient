@@ -25,6 +25,8 @@ public class FavouritesDAO
 	private static String removeItembyConnectionname = "DELETE FROM usersfavourites u WHERE connectionid=(SELECT id from ftpconnections where userid=? and connectionname like ?) AND userid=? AND folderpath like ?";
 
 	private static String insertItem = "INSERT INTO usersfavourites (userid,connectionid,folderpath) SELECT userid,id,? from ftpconnections where userid=? and connectionname like ?";
+	
+	private static String updateItem = "UPDATE usersfavourites SET folderpath=? WHERE userid=? AND connectionid=(SELECT id from ftpconnections where userid=? and connectionname like ?)";
 
 	/**
 	 * MEthod returns all Favourties for a specific User as an ArrayList
@@ -146,7 +148,7 @@ public class FavouritesDAO
 				+ " AND connectionname like '"
 				+ cb.getConnectionNAME()
 				+ "' "
-				+ " AND folderpath like '/"
+				+ " AND folderpath like '"
 				+ cb.getFolderPATH() + "'";
 		boolean ret = false;
 
@@ -213,6 +215,29 @@ public class FavouritesDAO
 			// TO get inserted ID
 		} catch (Exception ex) {
 			return false;
+		}
+	}
+
+	/**
+	 * Method changes the path of a favourite to the new one
+	 * @param cb Favourtie to modify
+	 * @param path new Path
+	 */
+	public void changeFavouritePath(FavouriteBean cb, String path) {
+		try {
+			PreparedStatement ps;
+			ps = SQLConnectionManager.getConnection().prepareStatement(updateItem);
+			ps.setString(1, path);
+			ps.setInt(2, cb.getUserID());
+			ps.setInt(3, cb.getUserID());
+			ps.setString(4, cb.getConnectionNAME());
+			if (ps.executeUpdate() != 0) {
+				// Close PreparedStatement before fetching new data
+				ps.close();
+			} else {
+				ps.close();
+			}
+		} catch (Exception ex) {
 		}
 	}
 

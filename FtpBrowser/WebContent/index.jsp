@@ -14,8 +14,6 @@
 <script src="js/jquery.mobile-1.0.min.js"></script>
 <script src="js/jquery.validate.min.js"></script>
 <link rel="stylesheet" href="css/jquery.mobile-1.0.min.css" type="text/css" />
-<link rel="stylesheet" href="css/prettyPhoto.css" type="text/css" media="screen" title="prettyPhoto main stylesheet" charset="utf-8" />
-<script src="js/jquery.prettyPhoto.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 
@@ -126,9 +124,7 @@
             
             <div id="errorDiv"></div>  
             </div></div>
-            <ul class="gallery clearfix">
-				<li><a id="myphoto" href="http://localhost:8080/FtpBrowser/temp/1.jpg?iframe=true&amp;width=300&amp;height=200" rel="prettyPhoto[iframe]"></a></li>
-				</ul>
+
      <div data-role="page" id="folderbrowser">
 		<header data-role="header">
 		  <h1 id="currentdirh3">Browser</h1>
@@ -140,6 +136,7 @@
 				data-dividertheme="f">
 
 			</ul>
+			<div id="tooldivs">
 			 <div id="makedirdiv" data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden">
 				<h3>Make Directory</h3>
 				<form action="" class="addDirectoryForm" method="post">
@@ -161,6 +158,7 @@
 <!-- 		<button id="px-submit" type="submit">Upload</button> -->
 <!-- 	</form> -->
 				</div>
+		</div>
 		</div>
 	</div>
 	
@@ -189,11 +187,6 @@
         htb.Logout.setup();
         htb.CreateFtp.setup();
     });
-    
-	$("area[rel^='prettyPhoto']").prettyPhoto();
-	
-	$(".gallery:first a[rel^='prettyPhoto']").prettyPhoto({animation_speed:'normal',theme:'light_square',slideshow:3000, autoplay_slideshow: false});
-
 </script>
 </body>
 	</html>
