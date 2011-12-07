@@ -8,12 +8,14 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Ftp Browser</title>
 <meta name="viewport" content="width=device-width, inital-scale=1.0, maximal-scale=1.0, user-scalable=no;"/>
-<link rel="stylesheet" href="jquery.mobile-1.0rc1.min.css" />
 
-<script src="jquery-1.6.4.min.js"></script>
-<script src="section_mobile.js"></script>
-<script src="jquery.mobile-1.0rc1.min.js"></script>
-<script src="jquery.validate.min.js"></script>
+<script src="js/jquery-1.6.4.min.js"></script>
+<script src="js/section_mobile.js"></script>
+<script src="js/jquery.mobile-1.0.min.js"></script>
+<script src="js/jquery.validate.min.js"></script>
+<link rel="stylesheet" href="css/jquery.mobile-1.0.min.css" type="text/css" />
+<link rel="stylesheet" href="css/prettyPhoto.css" type="text/css" media="screen" title="prettyPhoto main stylesheet" charset="utf-8" />
+<script src="js/jquery.prettyPhoto.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 
@@ -124,6 +126,9 @@
             
             <div id="errorDiv"></div>  
             </div></div>
+            <ul class="gallery clearfix">
+				<li><a id="myphoto" href="http://localhost:8080/FtpBrowser/temp/1.jpg?iframe=true&amp;width=300&amp;height=200" rel="prettyPhoto[iframe]"></a></li>
+				</ul>
      <div data-role="page" id="folderbrowser">
 		<header data-role="header">
 		  <h1 id="currentdirh3">Browser</h1>
@@ -131,7 +136,6 @@
 		  	<a href="index.jsp#ftpFavourites" data-icon="star">Favourites</a>
 		  		</header>
 		<div data-role="content">
-			 
 			<ul  id="ftpfoldercontentid" currentfolder="" connectionname="/" data-role="listview" data-inset="true" data-theme="c"
 				data-dividertheme="f">
 
@@ -185,6 +189,11 @@
         htb.Logout.setup();
         htb.CreateFtp.setup();
     });
+    
+	$("area[rel^='prettyPhoto']").prettyPhoto();
+	
+	$(".gallery:first a[rel^='prettyPhoto']").prettyPhoto({animation_speed:'normal',theme:'light_square',slideshow:3000, autoplay_slideshow: false});
+
 </script>
 </body>
 	</html>
