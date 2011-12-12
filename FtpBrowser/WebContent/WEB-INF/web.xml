@@ -3,7 +3,7 @@
   <display-name>FtpBrowser</display-name>
   <servlet>
 		<servlet-name>LoginServlet</servlet-name>
-		<servlet-class>it.unibz.util.LoginServlet</servlet-class>
+		<servlet-class>it.unibz.controller.LoginServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>LoginServlet</servlet-name>
@@ -11,7 +11,7 @@
 	</servlet-mapping>
 	<servlet>
         <servlet-name>FtpConnectionsServlet</servlet-name>
-        <servlet-class>it.unibz.util.FtpConnectionsServlet</servlet-class>
+        <servlet-class>it.unibz.controller.FtpConnectionsServlet</servlet-class>
   </servlet>
   <servlet-mapping>
         <servlet-name>FtpConnectionsServlet</servlet-name>
@@ -24,4 +24,5 @@
         <param-name>filesDir</param-name>
         <param-value>/temp/</param-value>
     </context-param>
+    <session-config> <session-timeout>30</session-timeout> </session-config> 
 </web-app>

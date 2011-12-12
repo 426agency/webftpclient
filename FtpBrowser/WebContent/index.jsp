@@ -8,12 +8,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Ftp Browser</title>
 <meta name="viewport" content="width=device-width, inital-scale=1.0, maximal-scale=1.0, user-scalable=no;"/>
-<link rel="stylesheet" href="jquery.mobile-1.0rc1.min.css" />
 
-<script src="jquery-1.6.4.min.js"></script>
-<script src="section_mobile.js"></script>
-<script src="jquery.mobile-1.0rc1.min.js"></script>
-<script src="jquery.validate.min.js"></script>
+<script src="js/jquery-1.6.4.min.js"></script>
+<script src="js/section_mobile.js"></script>
+<script src="js/jquery.mobile-1.0.min.js"></script>
+<script src="js/jquery.validate.min.js"></script>
+<link rel="stylesheet" href="css/jquery.mobile-1.0.min.css" type="text/css" />
 </head>
 <body>
 
@@ -85,6 +85,7 @@
             <div data-role="header">
                 <h1>Your Connections</h1>
 	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
+	<a href="index.jsp#ftpFavourites" data-icon="star">Favourites</a>
             </div>
             
             <div class="content" data-role="content" >
@@ -123,17 +124,19 @@
             
             <div id="errorDiv"></div>  
             </div></div>
+
      <div data-role="page" id="folderbrowser">
 		<header data-role="header">
 		  <h1 id="currentdirh3">Browser</h1>
 		  	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
+		  	<a href="index.jsp#ftpFavourites" data-icon="star">Favourites</a>
 		  		</header>
 		<div data-role="content">
-			 
 			<ul  id="ftpfoldercontentid" currentfolder="" connectionname="/" data-role="listview" data-inset="true" data-theme="c"
 				data-dividertheme="f">
 
 			</ul>
+			<div id="tooldivs">
 			 <div id="makedirdiv" data-role="collapsible" data-theme="d" data-collapsed="true" class="home_collapsible_hidden">
 				<h3>Make Directory</h3>
 				<form action="" class="addDirectoryForm" method="post">
@@ -156,7 +159,26 @@
 <!-- 	</form> -->
 				</div>
 		</div>
+		</div>
 	</div>
+	
+	 <div id="ftpFavourites" data-role="page">
+ <a href="" id="suserID" title="" ></a>
+ 
+            <div data-role="header">
+                <h1>Favourite Folder</h1>
+	<a href="index.jsp#ftpConnections" data-icon="back" onclick="">Connections</a>
+            </div>
+            
+            <div class="content" data-role="content" >
+            			<div data-role="collapsible-set" class="home_collapsibles" id="favourites_list">
+            			
+                    </div>
+          
+
+            
+            <div id="errorDiv"></div>  
+            </div></div>
 
 <script type="text/javascript">
     $(document).ready( function(){
