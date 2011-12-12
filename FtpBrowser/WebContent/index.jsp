@@ -50,7 +50,7 @@
 <div data-role="page" id="signup"> 
     <div data-role="header">
 
-        <h1> Create Account</h1>
+        <h1>Create Account</h1>
         <a href="#login" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>
     </div>
     <div data-role="content"> 
@@ -83,7 +83,7 @@
  <a href="" id="suserID" title="" ></a>
  
             <div data-role="header">
-                <h1>Your Connections</h1>
+                <h1>Connections</h1>
 	<a href="index.jsp" class="logoutlink" data-icon="delete" onclick="">Logout</a>
 	<a href="index.jsp#ftpFavourites" data-icon="star">Favourites</a>
             </div>
@@ -166,7 +166,7 @@
  <a href="" id="suserID" title="" ></a>
  
             <div data-role="header">
-                <h1>Favourite Folder</h1>
+                <h1>Favourites</h1>
 	<a href="index.jsp#ftpConnections" data-icon="back" onclick="">Connections</a>
             </div>
             
