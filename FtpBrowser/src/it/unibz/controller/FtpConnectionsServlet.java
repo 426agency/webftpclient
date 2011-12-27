@@ -157,11 +157,13 @@ public class FtpConnectionsServlet extends HttpServlet
 				try {
 					ftpconmgr.doConnection(cb.getUsername(), cb.getPassword(),
 							cb.getHost(), cb.getPort());
+					ss.setAttribute("connectionmanager", ftpconmgr);
+					ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
 				} catch (Exception e) {
-					throw new IOException("No connection possible");
+					response.getOutputStream().println(
+"fail");
+					return;
 				}
-				ss.setAttribute("connectionmanager", ftpconmgr);
-				ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
 			} else {
 				ftpconmgr = (FTPConnectionManager) ss.getAttribute("connectionmanager");
 			}
@@ -181,11 +183,14 @@ public class FtpConnectionsServlet extends HttpServlet
 				try {
 					ftpconmgr.doConnection(cb.getUsername(), cb.getPassword(),
 							cb.getHost(), cb.getPort());
+					ss.setAttribute("connectionmanager", ftpconmgr);
+					ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
 				} catch (Exception e) {
-					throw new IOException("No connection possible");
+					response.getOutputStream().println(
+"fail");
+					return;
 				}
-				ss.setAttribute("connectionmanager", ftpconmgr);
-				ss.setAttribute("currentfolder", request.getParameter("currentfolder"));
+
 			}
 
 			ArrayList catalogItems = null;

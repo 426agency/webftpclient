@@ -372,9 +372,11 @@ refreshFolders={refresh:function(){
 		dataType: 'json',
 		cache: false,
 		error: function(jqXHR, textStatus, errorThrown){
-			window.location="/FtpBrowser/index.jsp";
+			alert("There was an error, check your settings!");
+			window.location="/FtpBrowser/index.jsp#ftpConnections";
 		},
 		success: function(data, textStatus){
+			
 			resHtml = '<li><a class="mainfolderclass" href="#folderbrowser"  >..</a></li>';
 			resHtml+='<li>';
 
