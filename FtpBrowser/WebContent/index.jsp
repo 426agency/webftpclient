@@ -132,6 +132,7 @@
 		  	<a href="index.jsp#ftpFavourites" data-icon="star">Favourites</a>
 		  		</header>
 		<div data-role="content">
+			<p id="currentpath"></p>
 			<ul  id="ftpfoldercontentid" currentfolder="" connectionname="/" data-role="listview" data-inset="true" data-theme="c"
 				data-dividertheme="f">
 

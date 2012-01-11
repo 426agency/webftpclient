@@ -376,7 +376,21 @@ refreshFolders={refresh:function(){
 			window.location="/FtpBrowser/index.jsp#ftpConnections";
 		},
 		success: function(data, textStatus){
-			
+			toshow='';
+			folderpathtoshow = $("#ftpfoldercontentid").attr('currentfolder');
+			if(folderpathtoshow.length>25){
+				while(folderpathtoshow.length>25){
+					toshow+=folderpathtoshow.substring(0,25)+'<br />';
+					folderpathtoshow=folderpathtoshow.substring(25);
+				}
+				toshow+=folderpathtoshow;
+			}
+			else{
+				if(folderpathtoshow.length==0)
+					toshow='Root';
+				else
+				toshow=folderpathtoshow;
+		}$('#currentpath').html('Located at: '+ toshow);
 			resHtml = '<li><a class="mainfolderclass" href="#folderbrowser"  >..</a></li>';
 			resHtml+='<li>';
 
@@ -394,8 +408,8 @@ refreshFolders={refresh:function(){
 					else
 						resHtml+='fileclass';
 					resHtml+='" href="#folderbrowser" title="'+this.itemname+'"  filename="'+this.itemname+'">';
-					if(this.itemname.length>17)
-						resHtml+=this.itemname.substring(0,11)+'..'+this.itemname.substring(this.itemname.length-4);
+					if(this.itemname.length>13)
+						resHtml+=this.itemname.substring(0,8)+'..'+this.itemname.substring(this.itemname.length-4);
 					else
 						resHtml+=this.itemname;
 					resHtml+='</a></td><td width="20%"><img class="showhideimage" title="Edit" src="images/edit.gif"/></td></tr></table></h3>';
