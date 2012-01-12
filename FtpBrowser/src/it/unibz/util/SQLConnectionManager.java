@@ -22,7 +22,7 @@ public class SQLConnectionManager
 
 	private static final String user = "ftpunibzteam";
 
-	private static final String passwd = "thehons88";
+	private static final String passwd = "ftpunibz88";
 
 	private static final String dburl = "jdbc:postgresql://mysql.alwaysdata.com:5432/ftpunibzteam_main";
 
